@@ -1,0 +1,3 @@
+[submodule "regridder"]
+	path = regridder
+	url = git@github.com:nicjhan/ocean-regrid.git
