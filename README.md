@@ -1,6 +1,6 @@
-# ocean-regrid
+# ocean-ic
 
-Regrid GODAS or ORAS4 reanalysis to MOM or NEMO grids. In general this means regridding from regular lat-lon (GODAS) or tripolar (ORAS4) to tripolar (MOM and NEMO) grids.
+Create ocean initial conditions by regridding GODAS or ORAS4 reanalysis to MOM or NEMO grids.
 
 # Dependencies
 
@@ -45,8 +45,6 @@ $ ./makeic.py ORAS4 coords_T.nc coords_T.nc thetao_oras4_1m_2014_grid_T.nc so_or
     NEMO coordinates.nc data_1m_potential_temperature_nomask.nc nemo_oras4_ic.nc
 ```
 
-# Testing
-
 # How it works
 
 1. The reanalysis/obs dataset is regridded in the vertical to have the same depth and levels as the model grid. Linear interpolation is used for this. If the model is deeper than the obs then the deepest value is extended.
@@ -60,6 +58,7 @@ $ ./makeic.py ORAS4 coords_T.nc coords_T.nc thetao_oras4_1m_2014_grid_T.nc so_or
 # Limitations
 
 * When using GODAS reanalysis the values at high latitudes are unphysical due to limited observations.
+* Only 'cold-start' initial conditions are created consisting of temperature and salt fields. This means that the model will need to be spun up.
 
 # Example output
 
