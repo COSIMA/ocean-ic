@@ -63,8 +63,10 @@ $ ./makeic.py ORAS4 coords_T.nc coords_T.nc thetao_oras4_1m_2014_grid_T.nc so_or
 
 # Example output
 
+## MOM IC temperature field based on ORAS4 reanalysis
 ![Temp from MOM IC based on ORAS4 reanalysis](https://raw.github.com/nicjhan/ocean-ic/master/test_data/MOM_IC_TEMP_ORAS4.png)
 
+## MOM IC salt field based on GODAS reanalysis
 ![Salt from MOM IC based on GODAS reanalysis](https://raw.github.com/nicjhan/ocean-ic/master/test_data/MOM_IC_SALT_GODAS.png)
 
 Note that because GODAS has a limited domain the salt in the Arctic has been filled with a 'representational value', in this case taken from the Bering Strait.
