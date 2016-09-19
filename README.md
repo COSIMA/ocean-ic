@@ -13,7 +13,7 @@ ESMF releases can be found here: http://www.earthsystemmodeling.org/download/dat
 
 # Use
 
-Download a reanalysis dataset, many can be found here:
+Download ORAS4 or GODAS reanalysis dataset, links can be found here:
 
 https://reanalyses.org/ocean/overview-current-reanalyses
 
@@ -21,22 +21,28 @@ The horizontal and vertical model grid definitions as well as the land-sea mask 
 
 Example command regridding GODAS reanalysis to MOM:
 ```
-$ FIXME
+$ makeic.py GODAS pottmp.2016.nc pottmp.2016.nc pottmp.2016.nc salt.2016.nc \
+    MOM ocean_hgrid.nc ocean_vgrid.nc mom_godas_ic.nc --model_mask ocean_mask.nc
 ```
+
+Notice that since GODAS does not have separate horizontal and vertical grid definition files we just use the pottmp.nc file.
 
 Creating NEMO initial condition from GODAS:
 ```
-$ FIXME
+$ makeic.py GODAS pottmp.2016.nc pottmp.2016.nc pottmp.2016.nc salt.2016.nc  \
+    NEMO coordinates.nc data_1m_potential_temperature_nomask.nc nemo_godas_ic.nc
 ```
 
 Creating MOM initial conditions from ORAS4:
 ```
-$ ./makeic.py ORAS4 coords_T.nc coords_T.nc thetao_oras4_1m_2014_grid_T.nc so_oras4_1m_2014_grid_T.nc MOM ocean_hgrid.nc ocean_vgrid.nc output.nc --model_mask ocean_mask.nc
+$ ./makeic.py ORAS4 coords_T.nc coords_T.nc thetao_oras4_1m_2014_grid_T.nc so_oras4_1m_2014_grid_T.nc \
+    MOM ocean_hgrid.nc ocean_vgrid.nc mom_oras4_ic.nc --model_mask ocean_mask.nc
 ```
 
-Creating NEMO initial condisionf from ORAS4:
+Creating NEMO initial conditions from ORAS4:
 ```
-$ FIXME
+$ ./makeic.py ORAS4 coords_T.nc coords_T.nc thetao_oras4_1m_2014_grid_T.nc so_oras4_1m_2014_grid_T.nc \
+    NEMO coordinates.nc data_1m_potential_temperature_nomask.nc nemo_oras4_ic.nc
 ```
 
 # Testing
@@ -57,5 +63,9 @@ $ FIXME
 
 # Example output
 
-![MOM IC based on GODAS reanalysis](https://raw.github.com/nicjhan/ocean-ic/master/examples/MOM_IC_GODAS.png)
+![Temp from MOM IC based on ORAS4 reanalysis](https://raw.github.com/nicjhan/ocean-ic/master/test_data/MOM_IC_TEMP_ORAS4.png)
+
+![Salt from MOM IC based on GODAS reanalysis](https://raw.github.com/nicjhan/ocean-ic/master/test_data/MOM_IC_SALT_GODAS.png)
+
+Note that because GODAS has a limited domain the salt in the Arctic has been filled with a 'representational value', in this case taken from the Bering Strait.
 

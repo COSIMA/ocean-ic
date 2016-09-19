@@ -82,10 +82,11 @@ def main():
 
     # May need to scale the salt.
     with nc.Dataset(args.output_file, 'r+') as f:
-        for salt_name in ['so', 'salt']:
+        for salt_name in ['vosaline', 'salt']:
             try:
                 salt_var = f.variables[salt_name]
                 if salt_var.units == 'kg/kg':
+                    salt_var.units = 'psu'
                     salt_var[:] *= 1000
             except KeyError:
                 pass
