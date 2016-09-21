@@ -4,7 +4,7 @@ Create ocean initial conditions by regridding GODAS or ORAS4 reanalysis to MOM o
 
 # Dependencies
 
-This tool is written in Python and depends on many different Python packages. See section 'Install' below for instructions on how to download all of the Python dependencies. It also depends on
+This tool is written in Python and depends a few different Python packages. See section 'Install' below for instructions on how to download all of the Python dependencies. It also depends on
  [ESMF_RegridWeightGen](https://www.earthsystemcog.org/projects/regridweightgen/) program to perform regridding between non-rectilinear grids.
 
 # Install
@@ -25,12 +25,16 @@ $ source activate ocean
 
 # Use
 
-Download ORAS4 or GODAS reanalysis dataset, links can be found here:
+Download ORAS4 or GODAS reanalysis dataset, data can be found here:
 
 - GODAS: http://www.esrl.noaa.gov/psd/data/gridded/data.godas.html
-- ORAS4: ftp://ftp.icdc.zmaw.de/EASYInit/ORA-S4/
+- ORAS4: ftp://ftp.icdc.zmaw.de/EASYInit/ORA-S4/monthly_orca1/
 
-The horizontal and vertical model grid definitions as well as the land-sea mask are also needed, in the case or ORAS4 this is a separate file, for GODAS it is contained within the data file.
+For ORAS4 it is also necessary to download the grid definition file at:
+
+- ftp://ftp.icdc.zmaw.de/EASYInit/ORA-S4/orca1_coordinates/
+
+In addition the horizontal and vertical model grid definitions and land-sea mask are also needed. These should be a part of your model installation.
 
 Example command regridding GODAS reanalysis to MOM:
 ```
@@ -38,7 +42,7 @@ $ makeic.py GODAS pottmp.2016.nc pottmp.2016.nc pottmp.2016.nc salt.2016.nc \
     MOM ocean_hgrid.nc ocean_vgrid.nc mom_godas_ic.nc --model_mask ocean_mask.nc
 ```
 
-Notice that since GODAS does not have separate horizontal and vertical grid definition files we just use the pottmp.nc file.
+Notice that since GODAS does not have horizontal and vertical grid definition files we just use the pottmp.nc file.
 
 Creating NEMO initial condition from GODAS:
 ```
@@ -54,19 +58,11 @@ $ ./makeic.py ORAS4 coordinates_grid_T.nc coordinates_grid_T.nc thetao_oras4_1m_
 
 Creating NEMO initial conditions from ORAS4:
 ```
-$ ./makeic.py ORAS4 coordinatess_T.nc coordinatess_T.nc thetao_oras4_1m_2014_grid_T.nc so_oras4_1m_2014_grid_T.nc \
+$ ./makeic.py ORAS4 coordinates_grid_T.nc coordinates_grid_T.nc thetao_oras4_1m_2014_grid_T.nc so_oras4_1m_2014_grid_T.nc \
     NEMO coordinates.nc data_1m_potential_temperature_nomask.nc nemo_oras4_ic.nc
 ```
 
-# How it works
-
-1. The reanalysis/obs dataset is regridded in the vertical to have the same depth and levels as the model grid. Linear interpolation is used for this. If the model is deeper than the obs then the deepest value is extended.
-
-2. In the case of GODAS since the obs dataset is limited latitudinally it is extended to cover the whole globe. This is done based on nearest neighbours.
-
-3. The obs dataset is then regridded onto the model grid using weights calculated with ESMF_RegridWeightGen. Various regridding schemes are supported includeing distance weighted nearest neighbour, bilinear and conservative.
-
-4. The model land sea mask is applied and initial condition written out.
+Above we're using a NEMO data file, data_1m_potential_temperature_nomask to specify the vertical grid. The levels variable in the NEMO coordinates.nc is incomplete.
 
 # How to use the output
 
@@ -87,13 +83,50 @@ $ cp nemo_oras4_ic.nc data_1m_potential_temperature_nomask.nc
 $ cp nemo_oras4_ic.nc data_1m_salinity_nomask.nc
 ```
 
-Then check the following namelist option:
+Then check the following namelist options:
 
 ```{fortran}
 &namrun        !   parameters of the run
 !-----------------------------------------------------------------------
-ln_rstart   = .false.   !  start from rest (F) or from a restart file (T)
+    ln_rstart   = .false.   !  start from rest (F) or from a restart file (T)
+
+&namtsd    !   data : Temperature  & Salinity
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!          !  file name                            ! frequency (hours) ! variable  ! time interp. !  clim  ! 'yearly'/ ! weights  ! rotation ! land/sea mask !
+!          !                                       !  (if <0  months)  !   name    !   (logical)  !  (T/F) ! 'monthly' ! filename ! pairing  ! filename      !
+    sn_tem  = 'data_1m_potential_temperature_nomask',         -1        ,'votemper' ,    .false.    , .true. , 'yearly'   , ''       ,   ''    ,    ''
+    sn_sal  = 'data_1m_salinity_nomask'             ,         -1        ,'vosaline' ,    .false.    , .true. , 'yearly'   , ''       ,   ''    ,    ''
+    ln_tsd_init   = .true.    !  Initialisation of ocean T & S with T &S input data (T) or not (F)
+    ln_tsd_tradmp = .false.   !  damping of ocean T & S toward T &S input data (T) or not (F)
+/
 ```
+
+```{fortran}
+!-----------------------------------------------------------------------
+&namtra_dmp    !   tracer: T & S newtonian damping
+!-----------------------------------------------------------------------
+    ln_tradmp   =  .false.   !  add a damping termn (T) or not (F)
+/
+```
+
+Note that nudging / Newtownian damping (ln_tsd_tradmp) has been turned off and there is no time interpolation done on the input. The model output should then contain something like:
+
+```
+dta_tsd: deallocte T & S arrays as they are only use to initialize the run
+```
+
+If you do wish to do nudging / Newtownian damping then the initial condition must contain a time-series. One way to create this is the [ocean-nudge](https://github.com/nicjhan/ocean-ic.git) tool.
+
+# How it works
+
+1. The reanalysis/obs dataset is regridded in the vertical to have the same depth and levels as the model grid. Linear interpolation is used for this. If the model is deeper than the obs then the deepest value is extended.
+
+2. In the case of GODAS since the obs dataset is limited latitudinally it is extended to cover the whole globe. This is done based on nearest neighbours.
+
+3. The obs dataset is then regridded onto the model grid using weights calculated with ESMF_RegridWeightGen. Various regridding schemes are supported includeing distance weighted nearest neighbour, bilinear and conservative.
+
+4. The model land sea mask is applied and initial condition written out.
 
 # Limitations
 

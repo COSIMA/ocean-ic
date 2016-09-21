@@ -1,3 +1,8 @@
+# User
+test_data/*.nc
+test_data/*.gz
+test_data/*.Log
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
