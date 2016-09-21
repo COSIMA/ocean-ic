@@ -99,24 +99,20 @@ Then check the following namelist options:
     sn_sal  = 'data_1m_salinity_nomask'             ,         -1        ,'vosaline' ,    .false.    , .true. , 'yearly'   , ''       ,   ''    ,    ''
     ln_tsd_init   = .true.    !  Initialisation of ocean T & S with T &S input data (T) or not (F)
     ln_tsd_tradmp = .false.   !  damping of ocean T & S toward T &S input data (T) or not (F)
-/
-```
 
-```{fortran}
 !-----------------------------------------------------------------------
 &namtra_dmp    !   tracer: T & S newtonian damping
 !-----------------------------------------------------------------------
     ln_tradmp   =  .false.   !  add a damping termn (T) or not (F)
-/
 ```
 
-Note that nudging / Newtownian damping (ln_tsd_tradmp) has been turned off and there is no time interpolation done on the input. The model output should then contain something like:
+Note that nudging / Newtownian damping (ln_tsd_tradmp and ln_tradmp) has been turned off and there is no time interpolation done on the input. The model output should then contain something like:
 
 ```
 dta_tsd: deallocte T & S arrays as they are only use to initialize the run
 ```
 
-If you do wish to do nudging / Newtownian damping then the initial condition must contain a time-series. One way to create this is the [ocean-nudge](https://github.com/nicjhan/ocean-ic.git) tool.
+If you do wish to do nudging / Newtownian damping then the initial condition must contain a time-series. One way to create this is using the [ocean-nudge](https://github.com/nicjhan/ocean-ic.git) tool.
 
 # How it works
 
