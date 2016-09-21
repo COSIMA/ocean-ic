@@ -9,13 +9,26 @@ This tool is written in Python and depends on many different Python packages. Se
 
 # Install
 
-ESMF releases can be found here: http://www.earthsystemmodeling.org/download/data/releases.shtml
+1. Download and install [Anaconda](https://www.continuum.io/downloads) for your platform.
+2. Install ESMF_RegridWeightGen. ESMF releases can be found [here](http://www.earthsystemmodeling.org/download/data/releases.shtml).
+3. Install the [git](https://git-scm.com/) revision control system if you don't already have it.
+4. Download ocean-ic:
+```{bash}
+$ git clone --recursive https://github.com/nicjhan/ocean-ic.git
+$ cd ocean-ic
+```
+5. Setup the Anaconda environment. This will download all the necessary Python packages.
+```{bash}
+$ conda env create -f ocean.yml
+$ source activate ocean
+```
 
 # Use
 
 Download ORAS4 or GODAS reanalysis dataset, links can be found here:
 
-https://reanalyses.org/ocean/overview-current-reanalyses
+- GODAS: http://www.esrl.noaa.gov/psd/data/gridded/data.godas.html
+- ORAS4: ftp://ftp.icdc.zmaw.de/EASYInit/ORA-S4/
 
 The horizontal and vertical model grid definitions as well as the land-sea mask are also needed, in the case or ORAS4 this is a separate file, for GODAS it is contained within the data file.
 
@@ -35,13 +48,13 @@ $ makeic.py GODAS pottmp.2016.nc pottmp.2016.nc pottmp.2016.nc salt.2016.nc  \
 
 Creating MOM initial conditions from ORAS4:
 ```
-$ ./makeic.py ORAS4 coords_T.nc coords_T.nc thetao_oras4_1m_2014_grid_T.nc so_oras4_1m_2014_grid_T.nc \
+$ ./makeic.py ORAS4 coordinates_grid_T.nc coordinates_grid_T.nc thetao_oras4_1m_2014_grid_T.nc so_oras4_1m_2014_grid_T.nc \
     MOM ocean_hgrid.nc ocean_vgrid.nc mom_oras4_ic.nc --model_mask ocean_mask.nc
 ```
 
 Creating NEMO initial conditions from ORAS4:
 ```
-$ ./makeic.py ORAS4 coords_T.nc coords_T.nc thetao_oras4_1m_2014_grid_T.nc so_oras4_1m_2014_grid_T.nc \
+$ ./makeic.py ORAS4 coordinatess_T.nc coordinatess_T.nc thetao_oras4_1m_2014_grid_T.nc so_oras4_1m_2014_grid_T.nc \
     NEMO coordinates.nc data_1m_potential_temperature_nomask.nc nemo_oras4_ic.nc
 ```
 
