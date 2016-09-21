@@ -112,7 +112,7 @@ Note that nudging / Newtownian damping (ln_tsd_tradmp and ln_tradmp) has been tu
 dta_tsd: deallocte T & S arrays as they are only use to initialize the run
 ```
 
-If you do wish to do nudging / Newtownian damping then the initial condition must contain a time-series. One way to create this is using the [ocean-nudge](https://github.com/nicjhan/ocean-ic.git) tool.
+If you do wish to do nudging / Newtownian damping then the initial condition must contain a time-series. One way to create this is using the [ocean-nudge](https://github.com/nicjhan/ocean-nudge.git) tool.
 
 # How it works
 
