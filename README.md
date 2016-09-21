@@ -68,6 +68,33 @@ $ ./makeic.py ORAS4 coordinatess_T.nc coordinatess_T.nc thetao_oras4_1m_2014_gri
 
 4. The model land sea mask is applied and initial condition written out.
 
+# How to use the output
+
+## MOM
+
+Overwrite the output from the tool to the MOM initial condition file in the INPUT directory:
+
+```{bash}
+$ cp mom_oras4_ic.nc INPUT/ocean_temp_salt.res.nc
+```
+
+## NEMO
+
+Overwrite the output from the tool to the NEMO initial condition file in the model run directory:
+
+```{bash}
+$ cp nemo_oras4_ic.nc data_1m_potential_temperature_nomask.nc
+$ cp nemo_oras4_ic.nc data_1m_salinity_nomask.nc
+```
+
+Then check the following namelist option:
+
+```{fortran}
+&namrun        !   parameters of the run
+!-----------------------------------------------------------------------
+ln_rstart   = .false.   !  start from rest (F) or from a restart file (T)
+```
+
 # Limitations
 
 * When using GODAS reanalysis the values at high latitudes are unphysical due to limited observations.
