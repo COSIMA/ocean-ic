@@ -92,7 +92,6 @@ Then check the following namelist options:
 
 &namtsd    !   data : Temperature  & Salinity
 !-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
 !          !  file name                            ! frequency (hours) ! variable  ! time interp. !  clim  ! 'yearly'/ ! weights  ! rotation ! land/sea mask !
 !          !                                       !  (if <0  months)  !   name    !   (logical)  !  (T/F) ! 'monthly' ! filename ! pairing  ! filename      !
     sn_tem  = 'data_1m_potential_temperature_nomask',         -1        ,'votemper' ,    .false.    , .true. , 'yearly'   , ''       ,   ''    ,    ''
