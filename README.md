@@ -140,7 +140,7 @@ Note that because GODAS has a limited domain the salt in the Arctic has been fil
 
 # Developer notes
 
-## Build ESMF_RegridWeightGen statically
+## Building ESMF_RegridWeightGen
 
 ```{bash}
 $ export ESMF_DIR=<dir>
