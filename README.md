@@ -138,3 +138,37 @@ If you do wish to do nudging / Newtownian damping then the initial condition mus
 
 Note that because GODAS has a limited domain the salt in the Arctic has been filled with a 'representational value', in this case taken from the Bering Strait.
 
+# Developer notes
+
+## Build ESMF_RegridWeightGen statically
+
+```{bash}
+$ export ESMF_DIR=<dir>
+$ export ESMF_SHARED_LIB_BUILD=OFF
+$ cd $ESMF_DIR
+$ make
+$ cd src/apps/ESMF_RegridWeightGen
+$ make
+```
+
+## Package ocean-ic into a tarball using PyInstaller
+
+```{bash}
+$ pyinstaller makeic.spec
+```
+
+Upload tarball to s3:
+
+```{bash}
+$ s3put -b dp-drop -p <prefix> ./makeic-0.0.1.tar.gz
+$ s3cmd setacl --acl-public --guess-mime-type s3://dp-drop/makeic-0.0.1.tar.gz
+```
+
+Download tarball from s3:
+
+```{bash}
+$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/makeic-0.0.1.tar.gz
+$ tar zxvf makeic-0.0.1.tar.gz
+$ ./makeic-0.0.1/makeic --help
+```
+
