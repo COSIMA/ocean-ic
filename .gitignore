@@ -1,7 +1,7 @@
 # User
-test_data/*.nc
-test_data/*.gz
-test_data/*.Log
+ic_test_data/*.nc
+ic_test_data/*.gz
+ic_test_data/*.Log
 *.swp
 contrib
 

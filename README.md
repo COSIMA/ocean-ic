@@ -131,10 +131,10 @@ If you do wish to do nudging / Newtownian damping then the initial condition mus
 # Example output
 
 ## MOM IC temperature field based on ORAS4 reanalysis
-![Temp from MOM IC based on ORAS4 reanalysis](https://raw.github.com/nicjhan/ocean-ic/master/test_data/MOM_IC_TEMP_ORAS4.png)
+![Temp from MOM IC based on ORAS4 reanalysis](https://raw.github.com/nicjhan/ocean-ic/master/ic_test_data/MOM_IC_TEMP_ORAS4.png)
 
 ## MOM IC salt field based on GODAS reanalysis
-![Salt from MOM IC based on GODAS reanalysis](https://raw.github.com/nicjhan/ocean-ic/master/test_data/MOM_IC_SALT_GODAS.png)
+![Salt from MOM IC based on GODAS reanalysis](https://raw.github.com/nicjhan/ocean-ic/master/ic_test_data/MOM_IC_SALT_GODAS.png)
 
 Note that because GODAS has a limited domain the salt in the Arctic has been filled with a 'representational value', in this case taken from the Bering Strait.
 
@@ -145,6 +145,10 @@ Note that because GODAS has a limited domain the salt in the Arctic has been fil
 ```{bash}
 $ export ESMF_DIR=<dir>
 $ export ESMF_SHARED_LIB_BUILD=OFF
+$ export ESMF_NETCDF="split"
+$ export ESMF_NETCDF_INCLUDE=$NETCDF_BASE/include/GNU/
+$ export ESMF_NETCDF_LIBPATH=$NETCDF_BASE/lib/GNU
+$ export ESMF_NETCDF_LIBS="-lnetcdff -lnetcdf"
 $ cd $ESMF_DIR
 $ make
 $ cd src/apps/ESMF_RegridWeightGen
@@ -160,15 +164,26 @@ $ pyinstaller makeic.spec
 Upload tarball to s3:
 
 ```{bash}
-$ s3put -b dp-drop -p <prefix> ./makeic-0.0.1.tar.gz
+$ s3put -b dp-drop -p $(pwd) ./makeic-0.0.1.tar.gz
 $ s3cmd setacl --acl-public --guess-mime-type s3://dp-drop/makeic-0.0.1.tar.gz
 ```
 
-Download tarball from s3:
+Download tarball and test data from s3:
 
 ```{bash}
 $ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/makeic-0.0.1.tar.gz
 $ tar zxvf makeic-0.0.1.tar.gz
-$ ./makeic-0.0.1/makeic --help
+$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ic_test_data.tar.gz
+$ tar zxvf ic_test_data.tar.gz
+```
+
+Try it out:
+
+```{bash}
+$ export PATH=$(pwd)/makeic-0.0.1/:$PATH
+$ cd ic_test_data
+$ makeic --help
+$ makeic GODAS pottmp.2016.nc pottmp.2016.nc pottmp.2016.nc salt.2016.nc NEMO coordinates.nc data_1m_potential_temperature_nomask.nc nemo_godas_ic.nc
+$ ncview nemo_godas_ic
 ```
 
