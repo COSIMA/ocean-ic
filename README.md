@@ -2,6 +2,10 @@
 
 Create ocean initial conditions by regridding GODAS or ORAS4 reanalysis to MOM or NEMO grids.
 
+# Build status
+
+[![Build Status](https://travis-ci.org/nicjhan/ocean-ic.svg?branch=master)](https://travis-ci.org/nicjhan/ocean-ic)
+
 # Dependencies
 
 This tool is written in Python and depends a few different Python packages. See section 'Install' below for instructions on how to download all of the Python dependencies. It also depends on
