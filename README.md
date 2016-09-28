@@ -85,7 +85,7 @@ $ cd test
 $ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/test/test_data.tar.gz
 $ tar zxvf test_data.tar.gz
 $ cd test_data/input
-$ ./makeic.py ORAS4 coordinates_grid_T.nc coordinates_grid_T.nc thetao_oras4_1m_2014_grid_T.nc so_oras4_1m_2014_grid_T.nc \
+$ ./makeic.py ORAS4 coords_T.nc coords_T.nc thetao_oras4_1m_2014_grid_T.nc so_oras4_1m_2014_grid_T.nc \
     MOM ocean_hgrid.nc ocean_vgrid.nc mom_oras4_ic.nc --model_mask ocean_mask.nc
 $ ncview mom_oras4_ic.nc
 ```
@@ -97,7 +97,7 @@ $ cd test
 $ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/test/test_data.tar.gz
 $ tar zxvf test_data.tar.gz
 $ cd test_data/input
-$ ./makeic.py ORAS4 coordinates_grid_T.nc coordinates_grid_T.nc thetao_oras4_1m_2014_grid_T.nc so_oras4_1m_2014_grid_T.nc \
+$ ./makeic.py ORAS4 coords_T.nc coords_T.nc thetao_oras4_1m_2014_grid_T.nc so_oras4_1m_2014_grid_T.nc \
     NEMO coordinates.nc data_1m_potential_temperature_nomask.nc nemo_oras4_ic.nc
 $ ncview nemo_oras4_ic.nc
 ```
