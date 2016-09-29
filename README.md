@@ -13,18 +13,21 @@ This tool is written in Python and depends a few different Python packages. See 
 
 # Install
 
-## Python dependencies
+## Download
 
-1. Download and install [Anaconda](https://www.continuum.io/downloads) for your platform.
-2. Install ESMF_RegridWeightGen. ESMF releases can be found [here](http://www.earthsystemmodeling.org/download/data/releases.shtml).
-3. Install the [git](https://git-scm.com/) revision control system if you don't already have it.
-4. Download ocean-ic:
+Download ocean-ic:
 ```{bash}
 $ git clone --recursive https://github.com/nicjhan/ocean-ic.git
-$ cd ocean-ic
 ```
-5. Setup the Anaconda environment. This will download all the necessary Python packages.
+
+## Python dependencies
+
+Use Anaconda as described below or an existing Python setup.
+
+1. Download and install [Anaconda](https://www.continuum.io/downloads) for your platform.
+2. Setup the Anaconda environment. This will download all the necessary Python packages.
 ```{bash}
+$ cd ocean-ic
 $ conda env create -f regrid.yml
 $ source activate regrid
 ```
