@@ -195,50 +195,49 @@ Note that because GODAS has a limited domain the salt in the Arctic has been fil
 
 # Developer notes
 
-## Building ESMF_RegridWeightGen
-
-```{bash}
-$ export ESMF_DIR=<dir>
-$ export ESMF_SHARED_LIB_BUILD=OFF
-$ export ESMF_NETCDF="split"
-$ export ESMF_NETCDF_INCLUDE=$NETCDF_BASE/include/GNU/
-$ export ESMF_NETCDF_LIBPATH=$NETCDF_BASE/lib/GNU
-$ export ESMF_NETCDF_LIBS="-lnetcdff -lnetcdf"
-$ cd $ESMF_DIR
-$ make
-$ cd src/apps/ESMF_RegridWeightGen
-$ make
-```
-
 ## Package ocean-ic into a tarball using PyInstaller
 
+Be aware of this issue https://github.com/pyinstaller/pyinstaller/issues/1781. It's necessary to downgrade setuptools:
+
 ```{bash}
+$ conda install setuptools==19.2
+```
+
+Create release:
+
+```{bash}
+$ cd release
 $ pyinstaller makeic.spec
+$ mv dist/makeic ./makeic-0.0.2
+$ tar czvf makeic-0.0.2.tar.gz makeic-0.0.2
 ```
 
 Upload tarball to s3:
 
 ```{bash}
-$ s3put -b dp-drop -p $(pwd) ./makeic-0.0.1.tar.gz
-$ s3cmd setacl --acl-public --guess-mime-type s3://dp-drop/makeic-0.0.1.tar.gz
+$ s3put -b dp-drop -p /short/v45/nah599/more_home/ ./makeic-0.0.2.tar.gz
+$ s3cmd setacl --acl-public --guess-mime-type s3://dp-drop/ocean-ic/release/makeic-0.0.2.tar.gz
 ```
 
-Download tarball and test data from s3:
+## Download ocean-ic tarball and test
 
 ```{bash}
-$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/makeic-0.0.1.tar.gz
-$ tar zxvf makeic-0.0.1.tar.gz
-$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ic_test_data.tar.gz
-$ tar zxvf ic_test_data.tar.gz
-```
-
-Try it out:
-
-```{bash}
-$ export PATH=$(pwd)/makeic-0.0.1/:$PATH
-$ cd ic_test_data
+$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/release/makeic-0.0.2.tar.gz
+$ tar zxvf makeic-0.0.2.tar.gz
+$ export PATH=$(pwd)/makeic-0.0.2/:$PATH
 $ makeic --help
+$ cd test/
+$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/test/test_data.tar.gz
+$ tar zxvf test_data.tar.gz
+$ cd test_data/input
 $ makeic GODAS pottmp.2016.nc pottmp.2016.nc pottmp.2016.nc salt.2016.nc NEMO coordinates.nc data_1m_potential_temperature_nomask.nc nemo_godas_ic.nc
-$ ncview nemo_godas_ic
+```
+
+# Compare to known output
+
+```{bash}
+$ mkdir example_output
+$ cd example_output
+$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/test/example_output/nemo_godas_ic.nc
 ```
 

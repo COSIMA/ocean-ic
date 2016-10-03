@@ -1,8 +1,13 @@
 
 # User
 test/test_data
+test/example_output
 test/*.gz
 test/*.Log
+
+release/dist
+release/makeic-*
+makeic-0.*
 
 ic_test_data/*.nc
 ic_test_data/*.gz

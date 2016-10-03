@@ -2,11 +2,9 @@
 
 block_cipher = None
 
-
-a = Analysis(['makeic.py'],
+a = Analysis(['../makeic.py'],
              pathex=['/short/v45/nah599/more_home/ocean-ic'],
-             binaries=[('/home/599/nah599/more_home/anaconda/lib/python2.7/site-packages/llvmlite/binding/libllvmlite.so', 'llvmlite/binding'),
-                        ('/short/v45/nah599/more_home/ocean-ic/contrib/ESMF_RegridWeightGen', '')],
+             binaries=[('/home/599/nah599/more_home/anaconda2/lib/python2.7/site-packages/llvmlite/binding/libllvmlite.so', 'llvmlite/binding')],
              datas=None,
              hiddenimports=[],
              hookspath=[],
