@@ -28,7 +28,7 @@ def main():
     parser.add_argument('model_vgrid', help='Model vertical grid spec file.')
     parser.add_argument('output_file', help='Name of the destination/output file.')
     parser.add_argument('--model_mask', default=None, help='Model land-sea mask file.')
-    parser.add_argument('--month', default=1,
+    parser.add_argument('--month', default=1, type=int,
                         help="""Which month of the data to use.
                                 Assumes datasets containing 12 months.""")
     parser.add_argument('--use_mpi', action='store_true', default=False,
@@ -76,7 +76,7 @@ def main():
                                        args.model_vgrid,
                                        args.output_file, dest_var,
                                        args.model_mask, args.month,
-                                       weights, args.use_mpi)
+                                       weights, args.use_mpi, True)
         if weights is None:
             return 1
 
@@ -88,6 +88,14 @@ def main():
                 if salt_var.units == 'kg/kg':
                     salt_var.units = 'psu'
                     salt_var[:] *= 1000
+            except KeyError:
+                pass
+        for temp_name in ['votemper', 'temp']:
+            try:
+                temp_var = f.variables[temp_name]
+                if temp_var.units == 'K':
+                    temp_var.units = 'C'
+                    temp_var[:] -= 273.15
             except KeyError:
                 pass
 

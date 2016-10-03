@@ -2,16 +2,12 @@
 
 Create ocean initial conditions by regridding GODAS or ORAS4 reanalysis to MOM or NEMO grids.
 
-# Build status
-
-[![Build Status](https://travis-ci.org/nicjhan/ocean-ic.svg?branch=master)](https://travis-ci.org/nicjhan/ocean-ic)
-
-# Dependencies
-
-This tool is written in Python and depends a few different Python packages. See section 'Install' below for instructions on how to download all of the Python dependencies. It also depends on
- [ESMF_RegridWeightGen](https://www.earthsystemcog.org/projects/regridweightgen/) program to perform regridding between non-rectilinear grids.
+Build status: [![Build Status](https://travis-ci.org/nicjhan/ocean-ic.svg?branch=master)](https://travis-ci.org/nicjhan/ocean-ic)
 
 # Install
+
+This tool is written in Python and depends a few different Python packages. It also depends on
+ [ESMF_RegridWeightGen](https://www.earthsystemcog.org/projects/regridweightgen/) program to perform regridding between non-rectilinear grids.
 
 ## Download
 
@@ -65,11 +61,20 @@ $ ../../../makeic.py GODAS pottmp.2016.nc pottmp.2016.nc pottmp.2016.nc salt.201
 $ ncview mom_godas_ic.nc
 ```
 
+To verify your output:
+
+```
+$ mkdir -p test/example_output
+$ cd test/example_output
+$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/test/example_output/mom_godas_ic.nc
+$ ncdiff mom_godas_ic.nc ../test_data/input/mom_godas_ic.nc
+```
+
 Notice that since GODAS does not have horizontal and vertical grid definition files we just use the pottmp.nc file.
 
-## NEMO IC from GODAS:
+## NEMO IC from GODAS
 
-Note that there's no need to download the test data if you already did so above.
+There's no need to download the test data if you already did so above.
 
 ```
 $ cd test
@@ -81,7 +86,7 @@ $ ./makeic.py GODAS pottmp.2016.nc pottmp.2016.nc pottmp.2016.nc salt.2016.nc  \
 $ ncview nemo_godas_ic.nc
 ```
 
-## MOM IC from ORAS4:
+## MOM IC from ORAS4
 
 ```
 $ cd test
@@ -93,7 +98,7 @@ $ ./makeic.py ORAS4 coords_T.nc coords_T.nc thetao_oras4_1m_2014_grid_T.nc so_or
 $ ncview mom_oras4_ic.nc
 ```
 
-## NEMO IC from ORAS4:
+## NEMO IC from ORAS4
 
 ```
 $ cd test
