@@ -16,7 +16,7 @@ install:
   - conda update -q conda
   - conda info -a
 
-  - conda env create -f regrid.yml
+  - conda env create -f regridder/regrid.yml
   - source activate regrid
   - cd regridder/contrib
   - source build_esmf.sh

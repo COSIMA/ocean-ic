@@ -24,7 +24,7 @@ Use Anaconda as described below or an existing Python setup.
 2. Setup the Anaconda environment. This will download all the necessary Python packages.
 ```{bash}
 $ cd ocean-ic
-$ conda env create -f regrid.yml
+$ conda env create -f regridder/regrid.yml
 $ source activate regrid
 ```
 
