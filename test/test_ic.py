@@ -27,6 +27,9 @@ def check_output_fields(model_name, output):
 
     with nc.Dataset(output) as f:
         if model_name == 'MOM':
+            assert f.variables['temp'].units == 'C'
+            assert f.variables['salt'].units == 'psu'
+
             temp = f.variables['temp'][:]
             salt = f.variables['salt'][:]
         else:
@@ -63,6 +66,7 @@ class TestRegrid():
         return os.path.join(test_data_dir, 'output')
 
 
+    @pytest.mark.godas
     def test_mom_godas(self, input_dir, output_dir):
 
         output = os.path.join(output_dir, 'mom_godas_ic.nc')
@@ -95,6 +99,7 @@ class TestRegrid():
         check_output_fields('MOM', output)
         check_output_grid('MOM', output, src_hgrid, src_vgrid)
 
+    @pytest.mark.nemo
     def test_nemo_godas(self, input_dir, output_dir):
 
         output = os.path.join(output_dir, 'nemo_godas_ic.nc')
@@ -126,6 +131,7 @@ class TestRegrid():
         check_output_grid('NEMO', output, src_hgrid, src_vgrid)
 
 
+    @pytest.mark.oras4
     def test_mom_oras4(self, input_dir, output_dir):
 
         output = os.path.join(output_dir, 'mom_oras4_ic.nc')
@@ -158,6 +164,7 @@ class TestRegrid():
         check_output_fields('MOM', output)
         check_output_grid('MOM', output, src_hgrid, src_vgrid)
 
+    @pytest.mark.nemo
     def test_nemo_oras4(self, input_dir, output_dir):
 
         output = os.path.join(output_dir, 'nemo_oras4_ic.nc')
