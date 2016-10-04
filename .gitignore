@@ -1,5 +1,6 @@
 
 # User
+PET*.Log
 test/test_data
 test/example_output
 test/*.gz

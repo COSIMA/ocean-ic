@@ -34,6 +34,19 @@ Install ESMF_RegridWeightGen. ESMF releases can be found [here](http://www.earth
 
 There is a bash script regridder/contrib/build_esmf.sh which the testing system uses to build ESMF. This may be useful in addition to the ESMF installation docs.
 
+## Tarballs
+
+Executable tarballs that include all Python dependencies but not ESMF_RegridWeightGen.
+
+- http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/release/makeic-0.0.2.tar.gz
+
+```{bash}
+$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/release/makeic-0.0.2.tar.gz
+$ tar zxvf makeic-0.0.2.tar.gz
+$ export PATH=$(pwd)/makeic-0.0.2/:$PATH
+$ makeic --help
+```
+
 # Use
 
 Download ORAS4 or GODAS reanalysis dataset, data can be found here:
@@ -181,7 +194,11 @@ If you do wish to do nudging / Newtownian damping then the initial condition mus
 # Limitations
 
 * When using GODAS reanalysis the values at high latitudes are unphysical due to limited observations.
-* Only 'cold-start' initial conditions are created consisting of temperature and salt fields. This means that the model will need to be spun up.
+* Only 'cold-start' initial conditions are created consisting of temperature and salt fields. This means that the model will need to be spun up (possibly) with a reduced timestep. For example if you see output like the following from MOM it may be addressed by halving or quartering the timestep for a few months.
+
+```
+FATAL from PE  450:  Error: temperature out of range with value     6.041772359369E+01 at (i,j,k) = ( 133, 520, 15),  (lon,lat,dpt) = ( -246.8750,    5.3672,  164.1139 m)
+```
 
 # Example output
 

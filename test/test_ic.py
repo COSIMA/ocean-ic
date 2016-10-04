@@ -5,9 +5,40 @@ import pytest
 import os
 import subprocess as sp
 import sh
+import netCDF4 as nc
+import numpy as np
 
 data_tarball = 'test_data.tar.gz'
 data_tarball_url = 'http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/test/test_data.tar.gz'
+
+def check_output_grid(model_name, output, hgrid, vgrid):
+
+    with nc.Dataset(output) as f:
+        if model_name == 'MOM':
+            lats = f.variables['GRID_Y_T'][:]
+        else:
+            assert model_name == 'NEMO'
+            lats = f.variables['nav_lat'][:]
+
+    assert np.min(lats) < -78.0
+    assert np.max(lats) > 80.0
+
+def check_output_fields(model_name, output):
+
+    with nc.Dataset(output) as f:
+        if model_name == 'MOM':
+            temp = f.variables['temp'][:]
+            salt = f.variables['salt'][:]
+        else:
+            assert model_name == 'NEMO'
+            temp = f.variables['votemper'][:]
+            salt = f.variables['vosaline'][:]
+
+    assert np.max(temp) < 40.0
+    assert np.min(temp) > -10.0
+
+    assert np.max(salt) < 50.0
+    assert np.min(salt) > 0.0
 
 class TestRegrid():
 
@@ -30,6 +61,7 @@ class TestRegrid():
         test_data_dir = os.path.join(test_dir, 'test_data')
 
         return os.path.join(test_data_dir, 'output')
+
 
     def test_mom_godas(self, input_dir, output_dir):
 
@@ -60,6 +92,9 @@ class TestRegrid():
         # Check that outputs exist.
         assert(os.path.exists(output))
 
+        check_output_fields('MOM', output)
+        check_output_grid('MOM', output, src_hgrid, src_vgrid)
+
     def test_nemo_godas(self, input_dir, output_dir):
 
         output = os.path.join(output_dir, 'nemo_godas_ic.nc')
@@ -86,6 +121,9 @@ class TestRegrid():
 
         # Check that outputs exist.
         assert(os.path.exists(output))
+
+        check_output_fields('NEMO', output)
+        check_output_grid('NEMO', output, src_hgrid, src_vgrid)
 
 
     def test_mom_oras4(self, input_dir, output_dir):
@@ -117,6 +155,9 @@ class TestRegrid():
         # Check that outputs exist.
         assert(os.path.exists(output))
 
+        check_output_fields('MOM', output)
+        check_output_grid('MOM', output, src_hgrid, src_vgrid)
+
     def test_nemo_oras4(self, input_dir, output_dir):
 
         output = os.path.join(output_dir, 'nemo_oras4_ic.nc')
@@ -143,3 +184,6 @@ class TestRegrid():
 
         # Check that outputs exist.
         assert(os.path.exists(output))
+
+        check_output_fields('NEMO', output)
+        check_output_grid('NEMO', output, src_hgrid, src_vgrid)
