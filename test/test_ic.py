@@ -27,7 +27,8 @@ def check_output_fields(model_name, output):
 
     with nc.Dataset(output) as f:
         if model_name == 'MOM':
-            assert f.variables['temp'].units == 'C'
+            assert f.variables['temp'].units == 'C' or \
+                'celsius' in f.variables['temp'].units.lower()
             assert f.variables['salt'].units == 'psu'
 
             temp = f.variables['temp'][:]
