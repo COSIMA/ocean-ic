@@ -47,8 +47,8 @@ Executable tarballs that include all Python dependencies and grid definitions bu
 
 ```{bash}
 $ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/release/makeic-0.0.3.tar.gz
-$ tar zxvf makeic-0.0.2.tar.gz
-$ export PATH=$(pwd)/makeic-0.0.2/:$PATH
+$ tar zxvf makeic-0.0.3.tar.gz
+$ export PATH=$(pwd)/makeic-0.0.3/:$PATH
 $ makeic --help
 ```
 
@@ -213,24 +213,25 @@ Create release:
 ```{bash}
 $ cd release
 $ pyinstaller makeic.spec
-$ mv dist/makeic ./makeic-0.0.2
-$ tar czvf makeic-0.0.2.tar.gz makeic-0.0.2
+$ mv dist/makeic ./makeic-x.x.x
+$ tar czvf makeic-x.x.x.tar.gz makeic-x.x.x
 ```
 
 Upload tarball to s3:
 
 ```{bash}
-$ s3put -b dp-drop -p /short/v45/nah599/more_home/ ./makeic-0.0.2.tar.gz
-$ s3cmd setacl --acl-public --guess-mime-type s3://dp-drop/ocean-ic/release/makeic-0.0.2.tar.gz
+$ s3put -b dp-drop -p /short/v45/nah599/more_home/ ./makeic-x.x.x.tar.gz
+$ s3cmd setacl --acl-public --guess-mime-type s3://dp-drop/ocean-ic/release/makeic-x.x.x.tar.gz
 ```
 
 ## Download ocean-ic tarball and test
 
 ```{bash}
-$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/release/makeic-0.0.2.tar.gz
-$ tar zxvf makeic-0.0.2.tar.gz
-$ export PATH=$(pwd)/makeic-0.0.2/:$PATH
+$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/release/makeic-0.0.3.tar.gz
+$ tar zxvf makeic-0.0.3.tar.gz
+$ export PATH=$(pwd)/makeic-0.0.3/:$PATH
 $ makeic --help
+$ mkdir -p test
 $ cd test/
 $ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/test/test_data.tar.gz
 $ tar zxvf test_data.tar.gz
@@ -244,5 +245,7 @@ Compare to known output:
 $ mkdir example_output
 $ cd example_output
 $ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/test/example_output/nemo_godas_ic.nc
+$ ncdiff nemo_godas_ic.nc ../nemo_godas_ic.nc diff.nc
+$ ncview diff.nc
 ```
 
