@@ -14,7 +14,12 @@ This tool is written in Python and depends a few different Python packages. It a
 Download ocean-ic:
 ```{bash}
 $ git clone --recursive https://github.com/nicjhan/ocean-ic.git
+$ cd ocean-ic
+$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/grid_defs.tar.gz
+$ tar zxvf grid_defs.tar.gz
 ```
+
+Or see the section 'Tarballs' below.
 
 ## Python dependencies
 
@@ -36,12 +41,12 @@ There is a bash script regridder/contrib/build_esmf.sh which the testing system 
 
 ## Tarballs
 
-Executable tarballs that include all Python dependencies but not ESMF_RegridWeightGen.
+Executable tarballs that include all Python dependencies and grid definitions but not ESMF_RegridWeightGen.
 
-- http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/release/makeic-0.0.2.tar.gz
+- http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/release/makeic-0.0.3.tar.gz
 
 ```{bash}
-$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/release/makeic-0.0.2.tar.gz
+$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/release/makeic-0.0.3.tar.gz
 $ tar zxvf makeic-0.0.2.tar.gz
 $ export PATH=$(pwd)/makeic-0.0.2/:$PATH
 $ makeic --help
@@ -54,12 +59,6 @@ Download ORAS4 or GODAS reanalysis dataset, data can be found here:
 - GODAS: http://www.esrl.noaa.gov/psd/data/gridded/data.godas.html
 - ORAS4: ftp://ftp.icdc.zmaw.de/EASYInit/ORA-S4/monthly_orca1/
 
-For ORAS4 it is also necessary to download the grid definition file at:
-
-- ftp://ftp.icdc.zmaw.de/EASYInit/ORA-S4/orca1_coordinates/
-
-In addition the horizontal and vertical model grid definitions and land-sea mask are also needed. These should be a part of your model installation.
-
 The examples below use preprepared inputs and outputs.
 
 ## MOM IC from GODAS
@@ -69,8 +68,7 @@ $ cd test
 $ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/test/test_data.tar.gz
 $ tar zxvf test_data.tar.gz
 $ cd test_data/input
-$ ../../../makeic.py GODAS pottmp.2016.nc pottmp.2016.nc pottmp.2016.nc salt.2016.nc \
-    MOM ocean_hgrid.nc ocean_vgrid.nc mom_godas_ic.nc --model_mask ocean_mask.nc
+$ ../../../makeic.py GODAS pottmp.2016.nc salt.2016.nc MOM mom_godas_ic.nc
 $ ncview mom_godas_ic.nc
 ```
 
@@ -83,47 +81,37 @@ $ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/test/example_outp
 $ ncdiff mom_godas_ic.nc ../test_data/input/mom_godas_ic.nc
 ```
 
-Notice that since GODAS does not have horizontal and vertical grid definition files we just use the pottmp.nc file.
-
 ## NEMO IC from GODAS
 
-There's no need to download the test data if you already did so above.
+Download the test data as above.
 
 ```
-$ cd test
-$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/test/test_data.tar.gz
-$ tar zxvf test_data.tar.gz
 $ cd test_data/input
-$ ./makeic.py GODAS pottmp.2016.nc pottmp.2016.nc pottmp.2016.nc salt.2016.nc  \
-    NEMO coordinates.nc data_1m_potential_temperature_nomask.nc nemo_godas_ic.nc
+$ ../../../makeic.py GODAS pottmp.2016.nc salt.2016.nc NEMO nemo_godas_ic.nc
 $ ncview nemo_godas_ic.nc
 ```
 
 ## MOM IC from ORAS4
 
+Download the test data as above.
+
 ```
-$ cd test
-$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/test/test_data.tar.gz
-$ tar zxvf test_data.tar.gz
 $ cd test_data/input
-$ ./makeic.py ORAS4 coords_T.nc coords_T.nc thetao_oras4_1m_2014_grid_T.nc so_oras4_1m_2014_grid_T.nc \
-    MOM ocean_hgrid.nc ocean_vgrid.nc mom_oras4_ic.nc --model_mask ocean_mask.nc
+$ ./makeic.py ORAS4 thetao_oras4_1m_2014_grid_T.nc so_oras4_1m_2014_grid_T.nc \
+    MOM  mom_oras4_ic.nc
 $ ncview mom_oras4_ic.nc
 ```
 
 ## NEMO IC from ORAS4
 
+Download the test data as above.
+
 ```
-$ cd test
-$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/test/test_data.tar.gz
-$ tar zxvf test_data.tar.gz
 $ cd test_data/input
-$ ./makeic.py ORAS4 coords_T.nc coords_T.nc thetao_oras4_1m_2014_grid_T.nc so_oras4_1m_2014_grid_T.nc \
-    NEMO coordinates.nc data_1m_potential_temperature_nomask.nc nemo_oras4_ic.nc
+$ ../../../makeic.py ORAS4 thetao_oras4_1m_2014_grid_T.nc so_oras4_1m_2014_grid_T.nc \
+    NEMO nemo_oras4_ic.nc
 $ ncview nemo_oras4_ic.nc
 ```
-
-Above we're using a NEMO data file, data_1m_potential_temperature_nomask to specify the vertical grid. The levels variable in the NEMO coordinates.nc is incomplete.
 
 ## All of the above tests in one go
 
@@ -247,10 +235,10 @@ $ cd test/
 $ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/test/test_data.tar.gz
 $ tar zxvf test_data.tar.gz
 $ cd test_data/input
-$ makeic GODAS pottmp.2016.nc pottmp.2016.nc pottmp.2016.nc salt.2016.nc NEMO coordinates.nc data_1m_potential_temperature_nomask.nc nemo_godas_ic.nc
+$ makeic GODAS pottmp.2016.nc salt.2016.nc NEMO nemo_godas_ic.nc
 ```
 
-# Compare to known output
+Compare to known output:
 
 ```{bash}
 $ mkdir example_output

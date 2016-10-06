@@ -2,10 +2,26 @@
 
 block_cipher = None
 
+extra_bins = [
+    ('/home/599/nah599/more_home/anaconda2/lib/python2.7/site-packages/llvmlite/binding/libllvmlite.so', 'llvmlite/binding')
+]
+
+grid_def_datas = [
+    ('/short/v45/nah599/more_home/ocean-ic/grid_defs/coordinates.nc', './grid_defs/'),
+    ('/short/v45/nah599/more_home/ocean-ic/grid_defs/coordinates_grid_T.nc', './grid_defs/'),
+    ('/short/v45/nah599/more_home/ocean-ic/grid_defs/coordinates_grid_U.nc', './grid_defs/'),
+    ('/short/v45/nah599/more_home/ocean-ic/grid_defs/coordinates_grid_V.nc', './grid_defs/'),
+    ('/short/v45/nah599/more_home/ocean-ic/grid_defs/data_1m_potential_temperature_nomask.nc', './grid_defs/'),
+    ('/short/v45/nah599/more_home/ocean-ic/grid_defs/ocean_hgrid.nc', './grid_defs/'),
+    ('/short/v45/nah599/more_home/ocean-ic/grid_defs/ocean_mask.nc', './grid_defs/'),
+    ('/short/v45/nah599/more_home/ocean-ic/grid_defs/ocean_vgrid.nc', './grid_defs/'),
+    ('/short/v45/nah599/more_home/ocean-ic/grid_defs/pottmp.2016.nc', './grid_defs/')
+]
+
 a = Analysis(['../makeic.py'],
              pathex=['/short/v45/nah599/more_home/ocean-ic'],
-             binaries=[('/home/599/nah599/more_home/anaconda2/lib/python2.7/site-packages/llvmlite/binding/libllvmlite.so', 'llvmlite/binding')],
-             datas=None,
+             binaries=extra_bins,
+             datas=grid_def_datas,
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
