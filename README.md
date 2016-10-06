@@ -78,7 +78,7 @@ To verify your output:
 $ mkdir -p test/example_output
 $ cd test/example_output
 $ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/test/example_output/mom_godas_ic.nc
-$ ncdiff mom_godas_ic.nc ../test_data/input/mom_godas_ic.nc
+$ ncdiff mom_godas_ic.nc ../test_data/input/mom_godas_ic.nc diff.nc
 ```
 
 ## NEMO IC from GODAS
