@@ -74,15 +74,16 @@ def main():
         model_hgrid = os.path.join(grid_defs, 'ocean_hgrid.nc')
         model_vgrid = os.path.join(grid_defs, 'ocean_vgrid.nc')
         model_mask = os.path.join(grid_defs, 'ocean_mask.nc')
+        mm_arg = ['--model_mask', model_mask]
     else:
         model_hgrid = os.path.join(grid_defs, 'coordinates.nc')
         model_vgrid = os.path.join(grid_defs, 'data_1m_potential_temperature_nomask.nc')
         model_mask = None
+        mm_arg = []
 
     args = [args.reanalysis_name, reanalysis_hgrids[0], reanalysis_vgrid,
             args.temp_reanalysis_file, args.salt_reanalysis_file, args.model_name,
-            model_hgrid, model_vgrid, args.output_file,
-            '--model_mask', model_mask]
+            model_hgrid, model_vgrid, args.output_file] + mm_arg
     exe = os.path.join(os.path.dirname(__file__), 'makeic.py')
     return sp.call([exe] + args)
 
