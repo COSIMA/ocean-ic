@@ -84,7 +84,7 @@ class TestRegrid():
                 dest_name, dest_data_file]
 
         my_dir = os.path.dirname(os.path.realpath(__file__))
-        cmd = [os.path.join(my_dir, '../', 'makeic.py')] + args
+        cmd = [os.path.join(my_dir, '../', 'makeic_simple.py')] + args
         ret = sp.call(cmd)
         assert(ret == 0)
 
@@ -111,7 +111,7 @@ class TestRegrid():
                 dest_name, dest_data_file]
 
         my_dir = os.path.dirname(os.path.realpath(__file__))
-        cmd = [os.path.join(my_dir, '../', 'makeic.py')] + args
+        cmd = [os.path.join(my_dir, '../', 'makeic_simple.py')] + args
         ret = sp.call(cmd)
         assert(ret == 0)
 
@@ -139,7 +139,7 @@ class TestRegrid():
                 dest_name, dest_data_file]
 
         my_dir = os.path.dirname(os.path.realpath(__file__))
-        cmd = [os.path.join(my_dir, '../', 'makeic.py')] + args
+        cmd = [os.path.join(my_dir, '../', 'makeic_simple.py')] + args
         ret = sp.call(cmd)
         assert(ret == 0)
 
@@ -166,7 +166,7 @@ class TestRegrid():
                 dest_name, dest_data_file]
 
         my_dir = os.path.dirname(os.path.realpath(__file__))
-        cmd = [os.path.join(my_dir, '../', 'makeic.py')] + args
+        cmd = [os.path.join(my_dir, '../', 'makeic_simple.py')] + args
         ret = sp.call(cmd)
         assert(ret == 0)
 

@@ -50,6 +50,7 @@ $ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/release/makeic-0.
 $ tar zxvf makeic-0.0.3.tar.gz
 $ export PATH=$(pwd)/makeic-0.0.3/:$PATH
 $ makeic --help
+$ makeic_simple --help
 ```
 
 # Use
@@ -68,7 +69,22 @@ $ cd test
 $ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/test/test_data.tar.gz
 $ tar zxvf test_data.tar.gz
 $ cd test_data/input
-$ ../../../makeic.py GODAS pottmp.2016.nc salt.2016.nc MOM mom_godas_ic.nc
+$ ../../../makeic_simple.py GODAS pottmp.2016.nc salt.2016.nc MOM mom_godas_ic.nc
+$ ncview mom_godas_ic.nc
+```
+
+Rather than 'makeic_simple.py' there is also 'makeic.py' which requires that
+the full paths to the grid definitions be given.
+
+```{bash}
+$ cd test
+$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/test/test_data.tar.gz
+$ tar zxvf test_data.tar.gz
+$ cd test_data/input
+$ export GRID_DEFS=../../../grid_defs
+$ ../../../makeic.py GODAS $GIRD_DEFS/pottmp.2016.nc $GIRD_DEFS/pottmp.2016.nc \
+    pottmp.2016.nc salt.2016.nc \
+    MOM $GIRD_DEFS/ocean_hgrid.nc $GIRD_DEFS/ocean_vgrid.nc mom_godas_ic.nc
 $ ncview mom_godas_ic.nc
 ```
 
@@ -87,7 +103,7 @@ Download the test data as above.
 
 ```
 $ cd test_data/input
-$ ../../../makeic.py GODAS pottmp.2016.nc salt.2016.nc NEMO nemo_godas_ic.nc
+$ ../../../makeic_simple.py GODAS pottmp.2016.nc salt.2016.nc NEMO nemo_godas_ic.nc
 $ ncview nemo_godas_ic.nc
 ```
 
@@ -97,7 +113,7 @@ Download the test data as above.
 
 ```
 $ cd test_data/input
-$ ./makeic.py ORAS4 thetao_oras4_1m_2014_grid_T.nc so_oras4_1m_2014_grid_T.nc \
+$ ./makeic_simple.py ORAS4 thetao_oras4_1m_2014_grid_T.nc so_oras4_1m_2014_grid_T.nc \
     MOM  mom_oras4_ic.nc
 $ ncview mom_oras4_ic.nc
 ```
@@ -108,7 +124,7 @@ Download the test data as above.
 
 ```
 $ cd test_data/input
-$ ../../../makeic.py ORAS4 thetao_oras4_1m_2014_grid_T.nc so_oras4_1m_2014_grid_T.nc \
+$ ../../../makeic_simple.py ORAS4 thetao_oras4_1m_2014_grid_T.nc so_oras4_1m_2014_grid_T.nc \
     NEMO nemo_oras4_ic.nc
 $ ncview nemo_oras4_ic.nc
 ```
