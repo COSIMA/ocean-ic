@@ -41,16 +41,15 @@ There is a bash script regridder/contrib/build_esmf.sh which the testing system 
 
 ## Tarballs
 
-Executable tarballs that include all Python dependencies and grid definitions but not ESMF_RegridWeightGen.
+Executable tarballs that include all Python dependencies but not ESMF_RegridWeightGen. It does not include the 'makeic_simple.py' described below, only more complete 'makeic.py'.
 
-- http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/release/makeic-0.0.3.tar.gz
+- http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/release/makeic-0.0.4.tar.gz
 
 ```{bash}
-$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/release/makeic-0.0.3.tar.gz
-$ tar zxvf makeic-0.0.3.tar.gz
-$ export PATH=$(pwd)/makeic-0.0.3/:$PATH
+$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/release/makeic-0.0.4.tar.gz
+$ tar zxvf makeic-0.0.4.tar.gz
+$ export PATH=$(pwd)/makeic-0.0.4/:$PATH
 $ makeic --help
-$ makeic_simple --help
 ```
 
 # Use
@@ -249,9 +248,9 @@ $ s3cmd setacl --acl-public --guess-mime-type s3://dp-drop/ocean-ic/release/make
 ## Download ocean-ic tarball and test
 
 ```{bash}
-$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/release/makeic-0.0.3.tar.gz
-$ tar zxvf makeic-0.0.3.tar.gz
-$ export PATH=$(pwd)/makeic-0.0.3/:$PATH
+$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/release/makeic-0.0.4.tar.gz
+$ tar zxvf makeic-0.0.4.tar.gz
+$ export PATH=$(pwd)/makeic-0.0.4/:$PATH
 $ makeic_simple --help
 $ mkdir -p test
 $ cd test/
