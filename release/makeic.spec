@@ -14,23 +14,10 @@ if not os.path.exists(libllvmlite):
     print("ERROR: can't find libllvmlite.so, please edit libllvm var in makeic.spec.")
     sys.exit(1)
 
-grid_defs = os.path.join('../', 'grid_defs')
-grid_def_datas = []
-if os.path.exists(grid_defs):
-    files = ['coordinates.nc', 'coordinates_grid_T.nc', 'coordinates_grid_U.nc',
-             'coordinates_grid_V.nc', 'data_1m_potential_temperature_nomask.nc',
-             'ocean_hgrid.nc', 'ocean_vgrid.nc', 'ocean_mask.nc', 'pottmp.2016.nc']
-    for f in files:
-        grid_def_datas.append((os.path.join(grid_defs, f), './grid_defs/'))
-else:
-    print("WARNING: can't find grid definition directory. It won't be included.")
-
-
-a = Analysis([os.path.join(ocean_ic_dir, 'makeic.py'),
-              os.path.join(ocean_ic_dir, 'makeic_simple.py')],
+a = Analysis([os.path.join(ocean_ic_dir, 'makeic.py')],
              pathex=[ocean_ic_dir],
              binaries=[(libllvmlite, 'llvmlite/binding')],
-             datas=grid_def_datas,
+             datas=[],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
