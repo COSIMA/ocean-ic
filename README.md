@@ -218,10 +218,16 @@ Note that because GODAS has a limited domain the salt in the Arctic has been fil
 
 ## Package ocean-ic into a tarball using PyInstaller
 
-Be aware of this issue https://github.com/pyinstaller/pyinstaller/issues/1781. It's necessary to downgrade setuptools:
+Be aware of this issue https://github.com/pyinstaller/pyinstaller/issues/1781. It may be necessary to downgrade setuptools with the following command:
 
 ```{bash}
 $ conda install setuptools==19.2
+```
+
+First install pyinstaller:
+
+```{bash}
+$ pip install pyinstaller
 ```
 
 Create release:
@@ -246,13 +252,13 @@ $ s3cmd setacl --acl-public --guess-mime-type s3://dp-drop/ocean-ic/release/make
 $ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/release/makeic-0.0.3.tar.gz
 $ tar zxvf makeic-0.0.3.tar.gz
 $ export PATH=$(pwd)/makeic-0.0.3/:$PATH
-$ makeic --help
+$ makeic_simple --help
 $ mkdir -p test
 $ cd test/
 $ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/test/test_data.tar.gz
 $ tar zxvf test_data.tar.gz
 $ cd test_data/input
-$ makeic GODAS pottmp.2016.nc salt.2016.nc NEMO nemo_godas_ic.nc
+$ makeic_simple GODAS pottmp.2016.nc salt.2016.nc NEMO nemo_godas_ic.nc
 ```
 
 Compare to known output:
