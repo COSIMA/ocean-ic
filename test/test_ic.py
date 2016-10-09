@@ -121,6 +121,33 @@ class TestRegrid():
         check_output_fields('NEMO', output)
         check_output_grid('NEMO', output)
 
+    @pytest.mark.pentad
+    def test_nemo_godas_pentad(self, input_dir, output_dir):
+
+        output = os.path.join(output_dir, 'nemo_godas_pentad_ic.nc')
+        if os.path.exists(output):
+            os.remove(output)
+
+        src_name = 'GODAS'
+        src_temp_file = os.path.join(input_dir, 'godas.P.20031231.pentad.nc')
+        src_salt_file = os.path.join(input_dir, 'godas.P.20031231.pentad.nc')
+        dest_name = 'NEMO'
+        dest_data_file = output
+
+        args = [src_name, src_temp_file, src_salt_file,
+                dest_name, dest_data_file]
+
+        my_dir = os.path.dirname(os.path.realpath(__file__))
+        cmd = [os.path.join(my_dir, '../', 'makeic_simple.py')] + args
+        ret = sp.call(cmd)
+        assert(ret == 0)
+
+        # Check that outputs exist.
+        assert(os.path.exists(output))
+
+        check_output_fields('NEMO', output)
+        check_output_grid('NEMO', output)
+
 
     @pytest.mark.oras4
     def test_mom_oras4(self, input_dir, output_dir):
