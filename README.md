@@ -81,9 +81,10 @@ $ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/test/test_data.ta
 $ tar zxvf test_data.tar.gz
 $ cd test_data/input
 $ export GRID_DEFS=../../../grid_defs
-$ ../../../makeic.py GODAS $GIRD_DEFS/pottmp.2016.nc $GIRD_DEFS/pottmp.2016.nc \
+$ ../../../makeic.py GODAS $GRID_DEFS/pottmp.2016.nc $GRID_DEFS/pottmp.2016.nc \
     pottmp.2016.nc salt.2016.nc \
-    MOM $GIRD_DEFS/ocean_hgrid.nc $GIRD_DEFS/ocean_vgrid.nc mom_godas_ic.nc
+    MOM $GRID_DEFS/ocean_hgrid.nc $GRID_DEFS/ocean_vgrid.nc \
+    --model_mask $GRID_DEFS/ocean_mask.nc mom_godas_ic.nc
 $ ncview mom_godas_ic.nc
 ```
 
