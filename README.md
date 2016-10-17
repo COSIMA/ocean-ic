@@ -15,7 +15,7 @@ Download ocean-ic:
 ```{bash}
 $ git clone --recursive https://github.com/nicjhan/ocean-ic.git
 $ cd ocean-ic
-$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/grid_defs.tar.gz
+$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-regrid/grid_defs.tar.gz
 $ tar zxvf grid_defs.tar.gz
 ```
 
@@ -63,18 +63,6 @@ The examples below use preprepared inputs and outputs.
 
 ## MOM IC from GODAS
 
-```
-$ cd test
-$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/test/test_data.tar.gz
-$ tar zxvf test_data.tar.gz
-$ cd test_data/input
-$ ../../../makeic_simple.py GODAS pottmp.2016.nc salt.2016.nc MOM mom_godas_ic.nc
-$ ncview mom_godas_ic.nc
-```
-
-Rather than 'makeic_simple.py' there is also 'makeic.py' which requires that
-the full paths to the grid definitions be given.
-
 ```{bash}
 $ cd test
 $ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/test/test_data.tar.gz
@@ -85,6 +73,17 @@ $ ../../../makeic.py GODAS $GRID_DEFS/pottmp.2016.nc $GRID_DEFS/pottmp.2016.nc \
     pottmp.2016.nc salt.2016.nc \
     MOM $GRID_DEFS/ocean_hgrid.nc $GRID_DEFS/ocean_vgrid.nc \
     --model_mask $GRID_DEFS/ocean_mask.nc mom_godas_ic.nc
+$ ncview mom_godas_ic.nc
+```
+
+Rather than 'makeic.py' there is also 'makeic_simple.py' which does not require the full paths to grid definitions are given.
+
+```
+$ cd test
+$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/test/test_data.tar.gz
+$ tar zxvf test_data.tar.gz
+$ cd test_data/input
+$ ../../../makeic_simple.py GODAS pottmp.2016.nc salt.2016.nc MOM mom_godas_ic.nc
 $ ncview mom_godas_ic.nc
 ```
 
@@ -99,23 +98,26 @@ $ ncdiff mom_godas_ic.nc ../test_data/input/mom_godas_ic.nc diff.nc
 
 ## NEMO IC from GODAS
 
-Download the test data as above.
+Download the test data and set the GRID_DEFS environment variable as above.
 
 ```
 $ cd test_data/input
-$ ../../../makeic_simple.py GODAS pottmp.2016.nc salt.2016.nc NEMO nemo_godas_ic.nc
-$ ncview nemo_godas_ic.nc
+$ ../../../makeic.py ORAS4 $GRID_DEFS/coordinates_grid_T.nc $GRID_DEFS/coordinates_grid_T.nc \
+    pottmp.2016.nc salt.2016.nc \
+    NEMO $GRID_DEFS/coordinates.nc $GRID_DEFS/data_1m_potential_temperature_nomask.nc \
+    nemo_godas_ic.nc
 ```
 
 ## MOM IC from ORAS4
 
-Download the test data as above.
+Download the test data and set the GRID_DEFS environment variable as above.
 
 ```
 $ cd test_data/input
-$ ./makeic_simple.py ORAS4 thetao_oras4_1m_2014_grid_T.nc so_oras4_1m_2014_grid_T.nc \
-    MOM  mom_oras4_ic.nc
-$ ncview mom_oras4_ic.nc
+$ ../../../makeic.py ORAS4 $GRID_DEFS/coordinates_grid_T.nc $GRID_DEFS/coordinates_grid_T.nc \
+    thetao_oras4_1m_2014_grid_T.nc so_oras4_1m_2014_grid_T.nc \
+    MOM $GRID_DEFS/ocean_hgrid.nc $GRID_DEFS/ocean_vgrid.nc \
+    --model_mask $GRID_DEFS/ocean_mask.nc mom_oras4_ic.nc
 ```
 
 ## NEMO IC from ORAS4
@@ -124,8 +126,10 @@ Download the test data as above.
 
 ```
 $ cd test_data/input
-$ ../../../makeic_simple.py ORAS4 thetao_oras4_1m_2014_grid_T.nc so_oras4_1m_2014_grid_T.nc \
-    NEMO nemo_oras4_ic.nc
+$  ../../../makeic.py ORAS4 $GRID_DEFS/coordinates_grid_T.nc $GRID_DEFS/coordinates_grid_T.nc \
+    thetao_oras4_1m_2014_grid_T.nc so_oras4_1m_2014_grid_T.nc \
+    NEMO $GRID_DEFS/coordinates.nc $GRID_DEFS/data_1m_potential_temperature_nomask.nc \
+    nemo_oras4_ic.nc
 $ ncview nemo_oras4_ic.nc
 ```
 
