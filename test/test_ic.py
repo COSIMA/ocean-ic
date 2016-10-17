@@ -75,8 +75,8 @@ class TestRegrid():
             os.remove(output)
 
         src_name = 'GODAS'
-        src_temp_file = os.path.join(input_dir, 'pottmp.2016.nc')
-        src_salt_file = os.path.join(input_dir, 'salt.2016.nc')
+        src_temp_file = os.path.join(input_dir, 'pottmp.2001.nc')
+        src_salt_file = os.path.join(input_dir, 'salt.2001.nc')
         dest_name = 'MOM'
         dest_data_file = output
 
@@ -102,8 +102,8 @@ class TestRegrid():
             os.remove(output)
 
         src_name = 'GODAS'
-        src_temp_file = os.path.join(input_dir, 'pottmp.2016.nc')
-        src_salt_file = os.path.join(input_dir, 'salt.2016.nc')
+        src_temp_file = os.path.join(input_dir, 'pottmp.2001.nc')
+        src_salt_file = os.path.join(input_dir, 'salt.2001.nc')
         dest_name = 'NEMO'
         dest_data_file = output
 
