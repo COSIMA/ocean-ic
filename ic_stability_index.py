@@ -24,17 +24,37 @@ def main():
     parser.add_argument('salt_ic', help="The initial condition file containing salt")
     args = parser.parse_args()
 
+    salt_var_names = ['vosaline', 'salt', 'SALT']
+    temp_var_names = ['votemper', 'temp', 'TEMP', 'pottmp']
+    depth_var_names = ['depth', 'zt', 'ZT', 'AZ_50', 'level']
+
     with nc.Dataset(args.salt_ic) as f:
-        salt = f.variables['vosaline'][0, :, :, :]
+        for s in salt_var_names:
+            if f.variables.has_key(s):
+                salt = f.variables[s][0, :, :, :]
+                break
+        else:
+             raise KeyError(s)
 
     with nc.Dataset(args.temp_ic) as f:
-        temp = f.variables['votemper'][0, :, :, :]
-        tmp = f.variables['depth'][:]
+        for t in temp_var_names:
+            if f.variables.has_key(t):
+                temp = f.variables[t][0, :, :, :]
+                break
+        else:
+            raise KeyError(t)
 
-        levels = tmp.shape[0]
-        lats = salt.shape[1]
-        lons = salt.shape[2]
-        depth = np.vstack(([tmp]*lats*lons)).T.reshape(levels, lats, lons)
+        for d in depth_var_names:
+            if f.variables.has_key(d):
+                tmp = f.variables[d][:]
+                break
+        else:
+            raise KeyError(d)
+
+    levels = tmp.shape[0]
+    lats = salt.shape[1]
+    lons = salt.shape[2]
+    depth = np.vstack(([tmp]*lats*lons)).T.reshape(levels, lats, lons)
 
     f = nc.Dataset('./stability_index.nc', 'w')
     f.createDimension('x', lons)
