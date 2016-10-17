@@ -17,6 +17,15 @@ Calculate a 'stability metric' for the IC.
 Counting the tendendcy for parcels to move up (or down) the water column.
 """
 
+def level_of_first_masked(array):
+
+    assert len(array.shape) == 1
+
+    for i in range(len(array)):
+        if array.mask[i]:
+            break
+    return i
+
 def main():
 
     parser = argparse.ArgumentParser()
@@ -70,9 +79,13 @@ def main():
     accum = 0
     for lat in range(lats):
         for lon in range(lons):
-            si = np.sum(abs(np.sort(density[:, lat, lon]) - \
-                                density[:, lat, lon]))
-            si = si / float(density.shape[0])
+            lev = level_of_first_masked(density[:, lat, lon])
+            if lev == 0:
+                continue
+
+            si = np.sum(abs(np.sort(density[:lev, lat, lon]) - \
+                                density[:lev, lat, lon]))
+            si = si / float(lev)
             si_nc[lat, lon] = si
             accum += si
 
