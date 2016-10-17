@@ -66,6 +66,13 @@ class TestRegrid():
 
         return os.path.join(test_data_dir, 'output')
 
+    @pytest.fixture
+    def grid_def_dir(self):
+        test_dir = os.path.dirname(os.path.realpath(__file__))
+        grid_data_dir = os.path.join(test_dir, '../', 'grid_defs')
+
+        return grid_data_dir
+
 
     @pytest.mark.godas
     def test_mom_godas(self, input_dir, output_dir):
@@ -93,6 +100,73 @@ class TestRegrid():
 
         check_output_fields('MOM', output)
         check_output_grid('MOM', output)
+
+    @pytest.mark.grid_def
+    def test_godas_change_grid_def(self, input_dir, output_dir, grid_def_dir):
+        """
+        Use different GODAS grid definitions by the same source files and
+        expect the result to be the same.
+        """
+
+        outputA = os.path.join(output_dir, 'nemo_godas_2004_A_ic.nc')
+        outputB = os.path.join(output_dir, 'nemo_godas_2004_B_ic.nc')
+        if os.path.exists(outputA):
+            os.remove(outputA)
+        if os.path.exists(outputB):
+            os.remove(outputB)
+
+        src_name = 'GODAS'
+        src_hgrid = os.path.join(grid_def_dir, 'pottmp.2016.nc')
+        src_vgrid = os.path.join(grid_def_dir, 'pottmp.2016.nc')
+        src_temp_file = os.path.join(input_dir, 'pottmp.2004.nc')
+        src_salt_file = os.path.join(input_dir, 'salt.2004.nc')
+        dest_name = 'NEMO'
+        dest_hgrid = os.path.join(grid_def_dir, 'coordinates.nc')
+        dest_vgrid = os.path.join(grid_def_dir,
+                                    'data_1m_potential_temperature_nomask.nc')
+        dest_data_file = outputA
+
+        args = [src_name, src_hgrid, src_vgrid, src_temp_file, src_salt_file,
+                dest_name, dest_hgrid, dest_vgrid, dest_data_file]
+
+        my_dir = os.path.dirname(os.path.realpath(__file__))
+        cmd = [os.path.join(my_dir, '../', 'makeic.py')] + args
+        ret = sp.call(cmd)
+        assert(ret == 0)
+
+        # Now modify the src grid.
+        src_hgrid = os.path.join(input_dir, 'pottmp.2004.nc')
+        src_vgrid = os.path.join(input_dir, 'pottmp.2004.nc')
+        dest_data_file = outputB
+
+        args = [src_name, src_hgrid, src_vgrid, src_temp_file, src_salt_file,
+                dest_name, dest_hgrid, dest_vgrid, dest_data_file]
+
+        my_dir = os.path.dirname(os.path.realpath(__file__))
+        cmd = [os.path.join(my_dir, '../', 'makeic.py')] + args
+        ret = sp.call(cmd)
+        assert(ret == 0)
+
+        # Check that outputs exist.
+        assert(os.path.exists(outputA))
+        assert(os.path.exists(outputB))
+
+        check_output_fields('NEMO', outputA)
+        check_output_grid('NEMO', outputA)
+        check_output_fields('NEMO', outputB)
+        check_output_grid('NEMO', outputB)
+
+        # Check that fields are the same.
+        with nc.Dataset(outputA) as f:
+            temp_A = f.variables['votemper'][:]
+            salt_A = f.variables['vosaline'][:]
+
+        with nc.Dataset(outputB) as f:
+            temp_B = f.variables['votemper'][:]
+            salt_B = f.variables['vosaline'][:]
+
+            np.array_equal(temp_A, temp_B)
+            np.array_equal(salt_A, salt_B)
 
     @pytest.mark.nemo
     def test_nemo_godas(self, input_dir, output_dir):
