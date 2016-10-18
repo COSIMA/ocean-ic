@@ -14,17 +14,54 @@ from regridder import regrid
 """
 Calculate a 'stability metric' for the IC.
 
-Counting the tendendcy for parcels to move up (or down) the water column.
+This counts the fraction of cells in a column which need to move to make it
+completely stable.
 """
 
 def level_of_first_masked(array):
 
     assert len(array.shape) == 1
 
-    for i in range(len(array)):
+    i = 0
+    for i in xrange(len(array)):
         if array.mask[i]:
             break
     return i
+
+def calc_stability_index(temp, salt, levels):
+
+    assert len(temp.shape) == 3
+    assert len(salt.shape) == 3
+    assert len(levels.shape) == 1
+
+    num_levs = levels.shape[0]
+    lats = salt.shape[1]
+    lons = salt.shape[2]
+    depth = np.vstack(([levels]*lats*lons)).T.reshape(num_levs, lats, lons)
+
+    # Pressure in dbar
+    pressure = depth*0.1
+    density = eos80.dens(salt, temp, pressure)
+
+    si_ret = np.zeros((lats, lons))
+
+    # The score for each column is the sum of the difference between the
+    # current and sorted column.
+    for lat in range(lats):
+        for lon in range(lons):
+            if hasattr(density, 'mask'):
+                lev = level_of_first_masked(density[:, lat, lon])
+                if lev == 0:
+                    continue
+            else:
+                lev = density.shape[0]
+
+            si = np.count_nonzero(np.sort(density[:lev, lat, lon]) - density[:lev, lat, lon])
+            si = si / float(lev)
+            si_ret[lat, lon] = si
+
+    return si_ret
+
 
 def main():
 
@@ -41,6 +78,8 @@ def main():
         for s in salt_var_names:
             if f.variables.has_key(s):
                 salt = f.variables[s][0, :, :, :]
+                if f.variables[s].units == "kg/kg":
+                    salt *= 1000
                 break
         else:
              raise KeyError(s)
@@ -49,50 +88,34 @@ def main():
         for t in temp_var_names:
             if f.variables.has_key(t):
                 temp = f.variables[t][0, :, :, :]
+                if f.variables[t].units == "K":
+                    temp -= 273.15
                 break
         else:
             raise KeyError(t)
 
         for d in depth_var_names:
             if f.variables.has_key(d):
-                tmp = f.variables[d][:]
+                depth = f.variables[d][:]
                 break
         else:
             raise KeyError(d)
 
-    levels = tmp.shape[0]
+    si = calc_stability_index(temp, salt, depth)
     lats = salt.shape[1]
     lons = salt.shape[2]
-    depth = np.vstack(([tmp]*lats*lons)).T.reshape(levels, lats, lons)
 
     f = nc.Dataset('./stability_index.nc', 'w')
     f.createDimension('x', lons)
     f.createDimension('y', lats)
     si_nc = f.createVariable('stability', 'f8', ('y', 'x'))
 
-    # Pressure in dbar
-    pressure = depth*0.1
-    density = eos80.dens(salt, temp, pressure)
-
-    # The score for each column is the sum of the difference between the
-    # current and sorted column.
-    accum = 0
-    for lat in range(lats):
-        for lon in range(lons):
-            lev = level_of_first_masked(density[:, lat, lon])
-            if lev == 0:
-                continue
-
-            si = np.sum(abs(np.sort(density[:lev, lat, lon]) - \
-                                density[:lev, lat, lon]))
-            si = si / float(lev)
-            si_nc[lat, lon] = si
-            accum += si
+    si_nc[:] = si[:]
 
     f.close()
 
     # Total score is sum of all columns divided by total columns
-    print('Average stability metric (high is bad) {}'.format(accum / (lats*lons)))
+    print('Average stability metric (high is bad) {}'.format(np.sum(si) / (lats*lons)))
 
     return 0
 
