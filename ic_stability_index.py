@@ -28,7 +28,7 @@ def level_of_first_masked(array):
             break
     return i
 
-def calc_stability_index(temp, salt, levels):
+def calc_density(temp, salt, levels):
 
     assert len(temp.shape) == 3
     assert len(salt.shape) == 3
@@ -43,6 +43,15 @@ def calc_stability_index(temp, salt, levels):
     pressure = depth*0.1
     density = eos80.dens(salt, temp, pressure)
 
+    return density
+
+
+def calc_stability_index(temp, salt, levels):
+
+    density = calc_density(temp, salt, levels)
+
+    lats = salt.shape[1]
+    lons = salt.shape[2]
     si_ret = np.zeros((lats, lons))
 
     # The score for each column is the sum of the difference between the
@@ -62,12 +71,48 @@ def calc_stability_index(temp, salt, levels):
 
     return si_ret
 
+def create_more_stable_ic(temp, salt, levels):
+    """
+    Sort temp and salt based on density to create a more stable IC.
+    """
+
+    density = calc_density(temp, salt, levels)
+    lats = salt.shape[1]
+    lons = salt.shape[2]
+
+    new_temp = np.copy(temp)
+    new_salt = np.copy(salt)
+
+    for lat in range(lats):
+        for lon in range(lons):
+            if hasattr(density, 'mask'):
+                lev = level_of_first_masked(density[:, lat, lon])
+                if lev == 0:
+                    continue
+            else:
+                lev = density.shape[0]
+
+            t_col = temp[:lev, lat, lon]
+            s_col = salt[:lev, lat, lon]
+            d_col = density[:lev, lat, lon]
+
+            new_temp[:lev, lat, lon] = [t for _,t in sorted(zip(d_col,t_col),
+                                                            key=lambda x : x[0])]
+            new_salt[:lev, lat, lon] = [s for _,s in sorted(zip(d_col,s_col),
+                                                            key=lambda x : x[0])]
+
+            si = np.count_nonzero(np.sort(density[:lev, lat, lon]) - density[:lev, lat, lon])
+
+    return new_temp, new_salt
+
 
 def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument('temp_ic', help="The initial condition file containing temp")
     parser.add_argument('salt_ic', help="The initial condition file containing salt")
+    parser.add_argument('--output_stable', action='store_true',
+                        default=False, help="Output a more stable version of the IC.")
     args = parser.parse_args()
 
     salt_var_names = ['vosaline', 'salt', 'SALT']
@@ -75,24 +120,30 @@ def main():
     depth_var_names = ['depth', 'zt', 'ZT', 'AZ_50', 'level']
 
     with nc.Dataset(args.salt_ic) as f:
-        for s in salt_var_names:
-            if f.variables.has_key(s):
-                salt = f.variables[s][0, :, :, :]
-                if f.variables[s].units == "kg/kg":
-                    salt *= 1000
+        for salt_var in salt_var_names:
+            if f.variables.has_key(salt_var):
+                salt = f.variables[salt_var][0, :, :, :]
+                try:
+                    if f.variables[salt_var].units == "kg/kg":
+                        salt *= 1000
+                except AttributeError, e:
+                    pass
                 break
         else:
-             raise KeyError(s)
+             raise KeyError(salt_var)
 
     with nc.Dataset(args.temp_ic) as f:
-        for t in temp_var_names:
-            if f.variables.has_key(t):
-                temp = f.variables[t][0, :, :, :]
-                if f.variables[t].units == "K":
-                    temp -= 273.15
+        for temp_var in temp_var_names:
+            if f.variables.has_key(temp_var):
+                temp = f.variables[temp_var][0, :, :, :]
+                try:
+                    if f.variables[temp_var].units == "K":
+                        temp -= 273.15
+                except AttributeError, e:
+                    pass
                 break
         else:
-            raise KeyError(t)
+            raise KeyError(temp_var)
 
         for d in depth_var_names:
             if f.variables.has_key(d):
@@ -105,14 +156,25 @@ def main():
     lats = salt.shape[1]
     lons = salt.shape[2]
 
-    f = nc.Dataset('./stability_index.nc', 'w')
-    f.createDimension('x', lons)
-    f.createDimension('y', lats)
-    si_nc = f.createVariable('stability', 'f8', ('y', 'x'))
+    if args.output_stable:
+        new_temp, new_salt = create_more_stable_ic(temp, salt, depth)
 
-    si_nc[:] = si[:]
+        ret = sp.call(['nccopy', '-v', temp_var, args.temp_ic, './more_stable_ic.nc'])
+        assert ret == 0
+        ret = sp.call(['nccopy', '-v', salt_var, args.salt_ic, './more_stable_ic.nc'])
+        assert ret == 0
 
-    f.close()
+        with nc.Dataset('./more_stable_ic.nc', 'r+') as f:
+            f.variables[temp_var][0, :] = new_temp[:]
+            f.variables[salt_var][0, :] = new_salt[:]
+
+    with nc.Dataset('./stability_index.nc', 'w') as f:
+        f.createDimension('x', lons)
+        f.createDimension('y', lats)
+        si_nc = f.createVariable('stability', 'f8', ('y', 'x'))
+
+        si_nc[:] = si[:]
+
 
     # Total score is sum of all columns divided by total columns
     print('Average stability metric (high is bad) {}'.format(np.sum(si) / (lats*lons)))
