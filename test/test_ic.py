@@ -75,9 +75,9 @@ class TestRegrid():
 
 
     @pytest.mark.godas
-    def test_mom_godas(self, input_dir, output_dir):
+    def test_mom_godas_simple(self, input_dir, output_dir):
 
-        output = os.path.join(output_dir, 'mom_godas_ic.nc')
+        output = os.path.join(output_dir, 'mom_godas_simple_ic.nc')
         if os.path.exists(output):
             os.remove(output)
 
@@ -100,6 +100,42 @@ class TestRegrid():
 
         check_output_fields('MOM', output)
         check_output_grid('MOM', output)
+
+
+    @pytest.mark.mom
+    def test_mom_godas(self, input_dir, output_dir, grid_def_dir):
+
+        output = os.path.join(output_dir, 'mom_godas_ic.nc')
+        if os.path.exists(output):
+            os.remove(output)
+
+        src_name = 'GODAS'
+        src_hgrid = os.path.join(grid_def_dir, 'pottmp.2016.nc')
+        src_vgrid = os.path.join(grid_def_dir, 'pottmp.2016.nc')
+        src_temp_file = os.path.join(input_dir, 'pottmp.2001.nc')
+        src_salt_file = os.path.join(input_dir, 'salt.2001.nc')
+        dest_name = 'MOM'
+        dest_hgrid = os.path.join(grid_def_dir, 'ocean_hgrid.nc')
+        dest_vgrid = os.path.join(grid_def_dir, 'ocean_vgrid.nc')
+        mask_file = os.path.join(grid_def_dir, 'ocean_mask.nc')
+
+        dest_data_file = output
+
+        args = [src_name, src_hgrid, src_vgrid, src_temp_file, src_salt_file,
+                dest_name, dest_hgrid, dest_vgrid, dest_data_file,
+                '--model_mask', mask_file]
+
+        my_dir = os.path.dirname(os.path.realpath(__file__))
+        cmd = [os.path.join(my_dir, '../', 'makeic.py')] + args
+        ret = sp.call(cmd)
+        assert(ret == 0)
+
+        # Check that outputs exist.
+        assert(os.path.exists(output))
+
+        check_output_fields('MOM', output)
+        check_output_grid('MOM', output)
+
 
     @pytest.mark.grid_def
     def test_godas_change_grid_def(self, input_dir, output_dir, grid_def_dir):
