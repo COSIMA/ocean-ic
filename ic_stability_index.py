@@ -150,7 +150,6 @@ def main():
 
         si_nc[:] = si[:]
 
-
     # Total score is sum of all columns divided by total columns
     print('Average stability metric (high is bad) {}'.format(np.sum(si) / (lats*lons)))
 

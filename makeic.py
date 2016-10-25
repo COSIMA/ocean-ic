@@ -19,7 +19,7 @@ def main():
     parser.add_argument('salt_reanalysis_file', help='Salt file from reanalysis.')
 
     parser.add_argument('model_name', help="""
-                        Name of model, must be MOM or NEMO""")
+                        Name of model, must be MOM, MOM1 or NEMO""")
     parser.add_argument('model_hgrid', help='Model horizontal grid spec file.')
     parser.add_argument('model_vgrid', help='Model vertical grid spec file.')
     parser.add_argument('output_file', help='Name of the destination/output file.')
@@ -32,10 +32,11 @@ def main():
                                This will speed up the calculation considerably.""")
     args = parser.parse_args()
 
-    assert args.model_name == 'MOM' or args.model_name == 'NEMO'
+    assert args.model_name == 'MOM' or args.model_name == 'MOM1' or \
+        args.model_name == 'NEMO'
     assert args.reanalysis_name == 'GODAS' or args.reanalysis_name == 'ORAS4'
 
-    if args.model_name == 'MOM' and args.model_mask is None:
+    if 'MOM' in args.model_name and args.model_mask is None:
         print("When using model MOM please provide a mask using --model_mask",
                 file=sys.stderr)
         return 1
@@ -53,7 +54,7 @@ def main():
         temp_src_var = 'pottmp'
         salt_src_var = 'salt'
 
-    if args.model_name == 'MOM':
+    if 'MOM' in args.model_name:
         temp_dest_var = 'temp'
         salt_dest_var = 'salt'
     else:

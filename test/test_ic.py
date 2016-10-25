@@ -20,7 +20,7 @@ def check_output_grid(model_name, output):
             assert model_name == 'NEMO'
             lats = f.variables['nav_lat'][:]
 
-    assert np.min(lats) < -78.0
+    assert np.min(lats) < -76.0
     assert np.max(lats) > 80.0
 
 def check_output_fields(model_name, output):
@@ -43,6 +43,34 @@ def check_output_fields(model_name, output):
 
     assert np.max(salt) < 50.0
     assert np.min(salt) > 0.0
+
+def mom_godas_simple(which_mom, input_dir, output_dir):
+
+    assert which_mom == 'MOM' or which_mom == 'MOM1'
+
+    output = os.path.join(output_dir, '{}_godas_simple_ic.nc'.format(which_mom.lower()))
+    if os.path.exists(output):
+        os.remove(output)
+
+    src_name = 'GODAS'
+    src_temp_file = os.path.join(input_dir, 'pottmp.2001.nc')
+    src_salt_file = os.path.join(input_dir, 'salt.2001.nc')
+    dest_name = which_mom
+    dest_data_file = output
+
+    args = [src_name, src_temp_file, src_salt_file,
+            dest_name, dest_data_file]
+
+    my_dir = os.path.dirname(os.path.realpath(__file__))
+    cmd = [os.path.join(my_dir, '../', 'makeic_simple.py')] + args
+    ret = sp.call(cmd)
+    assert(ret == 0)
+
+    # Check that outputs exist.
+    assert(os.path.exists(output))
+
+    check_output_fields('MOM', output)
+    check_output_grid('MOM', output)
 
 class TestRegrid():
 
@@ -76,31 +104,12 @@ class TestRegrid():
 
     @pytest.mark.godas
     def test_mom_godas_simple(self, input_dir, output_dir):
+        mom_godas_simple('MOM', input_dir, output_dir)
 
-        output = os.path.join(output_dir, 'mom_godas_simple_ic.nc')
-        if os.path.exists(output):
-            os.remove(output)
-
-        src_name = 'GODAS'
-        src_temp_file = os.path.join(input_dir, 'pottmp.2001.nc')
-        src_salt_file = os.path.join(input_dir, 'salt.2001.nc')
-        dest_name = 'MOM'
-        dest_data_file = output
-
-        args = [src_name, src_temp_file, src_salt_file,
-                dest_name, dest_data_file]
-
-        my_dir = os.path.dirname(os.path.realpath(__file__))
-        cmd = [os.path.join(my_dir, '../', 'makeic_simple.py')] + args
-        ret = sp.call(cmd)
-        assert(ret == 0)
-
-        # Check that outputs exist.
-        assert(os.path.exists(output))
-
-        check_output_fields('MOM', output)
-        check_output_grid('MOM', output)
-
+    @pytest.mark.godas
+    @pytest.mark.mom1
+    def test_mom1_godas_simple(self, input_dir, output_dir):
+        mom_godas_simple('MOM1', input_dir, output_dir)
 
     @pytest.mark.mom
     def test_mom_godas(self, input_dir, output_dir, grid_def_dir):
