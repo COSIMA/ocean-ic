@@ -8,6 +8,7 @@ import subprocess as sp
 import netCDF4 as nc
 import numpy as np
 from seawater import eos80
+from scipy import ndimage as nd
 
 from regridder import regrid
 
@@ -71,47 +72,24 @@ def calc_stability_index(temp, salt, levels):
 
     return si_ret
 
-def create_more_stable_ic(temp, salt, levels):
+def make_more_stable_ic(ic_file, temp_var, salt_var):
     """
-    Sort temp and salt based on density to create a more stable IC.
     """
 
-    density = calc_density(temp, salt, levels)
-    lats = salt.shape[1]
-    lons = salt.shape[2]
+    sigma = (2, 3, 3)
 
-    new_temp = np.copy(temp)
-    new_salt = np.copy(salt)
-
-    for lat in range(lats):
-        for lon in range(lons):
-            if hasattr(density, 'mask'):
-                lev = level_of_first_masked(density[:, lat, lon])
-                if lev == 0:
-                    continue
-            else:
-                lev = density.shape[0]
-
-            t_col = temp[:lev, lat, lon]
-            s_col = salt[:lev, lat, lon]
-            d_col = density[:lev, lat, lon]
-
-            new_temp[:lev, lat, lon] = [t for _,t in sorted(zip(d_col,t_col),
-                                                            key=lambda x : x[0])]
-            new_salt[:lev, lat, lon] = [s for _,s in sorted(zip(d_col,s_col),
-                                                            key=lambda x : x[0])]
-
-            si = np.count_nonzero(np.sort(density[:lev, lat, lon]) - density[:lev, lat, lon])
-
-    return new_temp, new_salt
-
+    with nc.Dataset(ic_file, 'r+') as f:
+        temp = f.variables[temp_var]
+        temp[0, :, :, :] = nd.filters.gaussian_filter(temp[0, :, :, :], sigma)
+        salt = f.variables[salt_var]
+        salt[0, :, :, :] = nd.filters.gaussian_filter(salt[0, :, :, :], sigma)
 
 def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument('temp_ic', help="The initial condition file containing temp")
     parser.add_argument('salt_ic', help="The initial condition file containing salt")
-    parser.add_argument('--output_stable', action='store_true',
+    parser.add_argument('--output_more_stable', action='store_true',
                         default=False, help="Output a more stable version of the IC.")
     args = parser.parse_args()
 
@@ -156,17 +134,14 @@ def main():
     lats = salt.shape[1]
     lons = salt.shape[2]
 
-    if args.output_stable:
-        new_temp, new_salt = create_more_stable_ic(temp, salt, depth)
+    if args.output_more_stable:
 
         ret = sp.call(['nccopy', '-v', temp_var, args.temp_ic, './more_stable_ic.nc'])
         assert ret == 0
         ret = sp.call(['nccopy', '-v', salt_var, args.salt_ic, './more_stable_ic.nc'])
         assert ret == 0
 
-        with nc.Dataset('./more_stable_ic.nc', 'r+') as f:
-            f.variables[temp_var][0, :] = new_temp[:]
-            f.variables[salt_var][0, :] = new_salt[:]
+        make_more_stable_ic('./more_stable_ic.nc', temp_var, salt_var)
 
     with nc.Dataset('./stability_index.nc', 'w') as f:
         f.createDimension('x', lons)
