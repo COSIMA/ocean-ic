@@ -1,6 +1,6 @@
 # ocean-ic
 
-Create ocean initial conditions by regridding GODAS or ORAS4 reanalysis to MOM or NEMO grids.
+Create ocean initial conditions by regridding GODAS or ORAS4 reanalysis to MOM 0.25 degree, MOM 1 degree or NEMO grids.
 
 Build status: [![Build Status](https://travis-ci.org/nicjhan/ocean-ic.svg?branch=master)](https://travis-ci.org/nicjhan/ocean-ic)
 
@@ -61,7 +61,7 @@ Download ORAS4 or GODAS reanalysis dataset, data can be found here:
 
 The examples below use preprepared inputs and outputs.
 
-## MOM IC from GODAS
+## MOM 0.25 degree IC from GODAS
 
 ```{bash}
 $ cd test
@@ -95,6 +95,23 @@ $ cd test/example_output
 $ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/test/example_output/mom_godas_ic.nc
 $ ncdiff mom_godas_ic.nc ../test_data/input/mom_godas_ic.nc diff.nc
 ```
+
+## MOM 1 degree IC from GODAS
+
+```{bash}
+$ cd test
+$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/test/test_data.tar.gz
+$ tar zxvf test_data.tar.gz
+$ cd test_data/input
+$ export GRID_DEFS=../../../grid_defs
+$ ../../../makeic.py GODAS $GRID_DEFS/pottmp.2016.nc $GRID_DEFS/pottmp.2016.nc \
+    pottmp.2016.nc salt.2016.nc \
+    MOM1 $GRID_DEFS/grid_spec.nc $GRID_DEFS/grid_spec.nc \
+    --model_mask $GRID_DEFS/grid_spec.nc mom1_godas_ic.nc
+$ ncview mom_godas_ic.nc
+```
+
+Note that the model name is now MOM1 instead of MOM as above. 'makeic_simple.py' can also be used as above.
 
 ## NEMO IC from GODAS
 
