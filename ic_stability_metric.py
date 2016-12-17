@@ -14,7 +14,7 @@ from regridder import regrid
 """
 Calculate a 'stability metric' for the IC.
 
-Counting the tendendcy for parcels to move up (or down) the water column.
+Counting the tendency for parcels to move up (or down) the water column.
 """
 
 def main():
