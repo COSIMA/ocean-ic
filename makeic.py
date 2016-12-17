@@ -76,6 +76,10 @@ def main():
                                        use_mpi=args.use_mpi, write_ic=True)
         if weights is None:
             return 1
+    try:
+        os.remove(weights)
+    except OSError:
+        pass
 
     # May need to scale the salt.
     with nc.Dataset(args.output_file, 'r+') as f:
