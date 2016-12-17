@@ -17,7 +17,7 @@ grid_defs_error = \
 """
 Grid definitions directory {} not found.
 please download it with:
-wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/grid_defs.tar.gz
+wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-regrid/grid_defs.tar.gz
 and unzip into the same directory as this executable.
 """
 
@@ -43,11 +43,12 @@ def main():
     parser.add_argument('salt_reanalysis_file', help='Salt file from reanalysis.')
 
     parser.add_argument('model_name', help="""
-                        Name of model, must be MOM or NEMO""")
+                        Name of model, must be MOM, MOM1 or NEMO""")
     parser.add_argument('output_file', help='Name of the destination/output file.')
     args = parser.parse_args()
 
-    assert args.model_name == 'MOM' or args.model_name == 'NEMO'
+    assert args.model_name == 'MOM' or args.model_name == 'MOM1' or \
+        args.model_name == 'NEMO'
     assert args.reanalysis_name == 'GODAS' or args.reanalysis_name == 'ORAS4'
 
     if os.path.exists(args.output_file):
@@ -74,6 +75,11 @@ def main():
         model_hgrid = os.path.join(grid_defs, 'ocean_hgrid.nc')
         model_vgrid = os.path.join(grid_defs, 'ocean_vgrid.nc')
         model_mask = os.path.join(grid_defs, 'ocean_mask.nc')
+        mm_arg = ['--model_mask', model_mask]
+    elif args.model_name == 'MOM1':
+        model_hgrid = os.path.join(grid_defs, 'grid_spec.nc')
+        model_vgrid = os.path.join(grid_defs, 'grid_spec.nc')
+        model_mask = os.path.join(grid_defs, 'grid_spec.nc')
         mm_arg = ['--model_mask', model_mask]
     else:
         model_hgrid = os.path.join(grid_defs, 'coordinates.nc')

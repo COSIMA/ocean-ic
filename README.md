@@ -1,6 +1,6 @@
 # ocean-ic
 
-Create ocean initial conditions by regridding GODAS or ORAS4 reanalysis to MOM or NEMO grids.
+Create ocean initial conditions by regridding GODAS or ORAS4 reanalysis to MOM 0.25 degree, MOM 1 degree or NEMO grids.
 
 Build status: [![Build Status](https://travis-ci.org/nicjhan/ocean-ic.svg?branch=master)](https://travis-ci.org/nicjhan/ocean-ic)
 
@@ -15,7 +15,7 @@ Download ocean-ic:
 ```{bash}
 $ git clone --recursive https://github.com/nicjhan/ocean-ic.git
 $ cd ocean-ic
-$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/grid_defs.tar.gz
+$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-regrid/grid_defs.tar.gz
 $ tar zxvf grid_defs.tar.gz
 ```
 
@@ -41,16 +41,15 @@ There is a bash script regridder/contrib/build_esmf.sh which the testing system 
 
 ## Tarballs
 
-Executable tarballs that include all Python dependencies and grid definitions but not ESMF_RegridWeightGen.
+Executable tarballs that include all Python dependencies but not ESMF_RegridWeightGen. It does not include the 'makeic_simple.py' described below, only more complete 'makeic.py'.
 
-- http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/release/makeic-0.0.3.tar.gz
+- http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/release/makeic-0.0.4.tar.gz
 
 ```{bash}
-$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/release/makeic-0.0.3.tar.gz
-$ tar zxvf makeic-0.0.3.tar.gz
-$ export PATH=$(pwd)/makeic-0.0.3/:$PATH
+$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/release/makeic-0.0.4.tar.gz
+$ tar zxvf makeic-0.0.4.tar.gz
+$ export PATH=$(pwd)/makeic-0.0.4/:$PATH
 $ makeic --help
-$ makeic_simple --help
 ```
 
 # Use
@@ -62,19 +61,7 @@ Download ORAS4 or GODAS reanalysis dataset, data can be found here:
 
 The examples below use preprepared inputs and outputs.
 
-## MOM IC from GODAS
-
-```
-$ cd test
-$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/test/test_data.tar.gz
-$ tar zxvf test_data.tar.gz
-$ cd test_data/input
-$ ../../../makeic_simple.py GODAS pottmp.2016.nc salt.2016.nc MOM mom_godas_ic.nc
-$ ncview mom_godas_ic.nc
-```
-
-Rather than 'makeic_simple.py' there is also 'makeic.py' which requires that
-the full paths to the grid definitions be given.
+## MOM 0.25 degree IC from GODAS
 
 ```{bash}
 $ cd test
@@ -82,9 +69,21 @@ $ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/test/test_data.ta
 $ tar zxvf test_data.tar.gz
 $ cd test_data/input
 $ export GRID_DEFS=../../../grid_defs
-$ ../../../makeic.py GODAS $GIRD_DEFS/pottmp.2016.nc $GIRD_DEFS/pottmp.2016.nc \
+$ ../../../makeic.py GODAS $GRID_DEFS/pottmp.2016.nc $GRID_DEFS/pottmp.2016.nc \
     pottmp.2016.nc salt.2016.nc \
-    MOM $GIRD_DEFS/ocean_hgrid.nc $GIRD_DEFS/ocean_vgrid.nc mom_godas_ic.nc
+    MOM $GRID_DEFS/ocean_hgrid.nc $GRID_DEFS/ocean_vgrid.nc \
+    --model_mask $GRID_DEFS/ocean_mask.nc mom_godas_ic.nc
+$ ncview mom_godas_ic.nc
+```
+
+Rather than 'makeic.py' there is also 'makeic_simple.py' which does not require the full paths to grid definitions are given.
+
+```
+$ cd test
+$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/test/test_data.tar.gz
+$ tar zxvf test_data.tar.gz
+$ cd test_data/input
+$ ../../../makeic_simple.py GODAS pottmp.2016.nc salt.2016.nc MOM mom_godas_ic.nc
 $ ncview mom_godas_ic.nc
 ```
 
@@ -97,25 +96,45 @@ $ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/test/example_outp
 $ ncdiff mom_godas_ic.nc ../test_data/input/mom_godas_ic.nc diff.nc
 ```
 
+## MOM 1 degree IC from GODAS
+
+```{bash}
+$ cd test
+$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/test/test_data.tar.gz
+$ tar zxvf test_data.tar.gz
+$ cd test_data/input
+$ export GRID_DEFS=../../../grid_defs
+$ ../../../makeic.py GODAS $GRID_DEFS/pottmp.2016.nc $GRID_DEFS/pottmp.2016.nc \
+    pottmp.2016.nc salt.2016.nc \
+    MOM1 $GRID_DEFS/grid_spec.nc $GRID_DEFS/grid_spec.nc \
+    --model_mask $GRID_DEFS/grid_spec.nc mom1_godas_ic.nc
+$ ncview mom_godas_ic.nc
+```
+
+Note that the model name is now MOM1 instead of MOM as above. 'makeic_simple.py' can also be used as above.
+
 ## NEMO IC from GODAS
 
-Download the test data as above.
+Download the test data and set the GRID_DEFS environment variable as above.
 
 ```
 $ cd test_data/input
-$ ../../../makeic_simple.py GODAS pottmp.2016.nc salt.2016.nc NEMO nemo_godas_ic.nc
-$ ncview nemo_godas_ic.nc
+$ ../../../makeic.py ORAS4 $GRID_DEFS/coordinates_grid_T.nc $GRID_DEFS/coordinates_grid_T.nc \
+    pottmp.2016.nc salt.2016.nc \
+    NEMO $GRID_DEFS/coordinates.nc $GRID_DEFS/data_1m_potential_temperature_nomask.nc \
+    nemo_godas_ic.nc
 ```
 
 ## MOM IC from ORAS4
 
-Download the test data as above.
+Download the test data and set the GRID_DEFS environment variable as above.
 
 ```
 $ cd test_data/input
-$ ./makeic_simple.py ORAS4 thetao_oras4_1m_2014_grid_T.nc so_oras4_1m_2014_grid_T.nc \
-    MOM  mom_oras4_ic.nc
-$ ncview mom_oras4_ic.nc
+$ ../../../makeic.py ORAS4 $GRID_DEFS/coordinates_grid_T.nc $GRID_DEFS/coordinates_grid_T.nc \
+    thetao_oras4_1m_2014_grid_T.nc so_oras4_1m_2014_grid_T.nc \
+    MOM $GRID_DEFS/ocean_hgrid.nc $GRID_DEFS/ocean_vgrid.nc \
+    --model_mask $GRID_DEFS/ocean_mask.nc mom_oras4_ic.nc
 ```
 
 ## NEMO IC from ORAS4
@@ -124,8 +143,10 @@ Download the test data as above.
 
 ```
 $ cd test_data/input
-$ ../../../makeic_simple.py ORAS4 thetao_oras4_1m_2014_grid_T.nc so_oras4_1m_2014_grid_T.nc \
-    NEMO nemo_oras4_ic.nc
+$  ../../../makeic.py ORAS4 $GRID_DEFS/coordinates_grid_T.nc $GRID_DEFS/coordinates_grid_T.nc \
+    thetao_oras4_1m_2014_grid_T.nc so_oras4_1m_2014_grid_T.nc \
+    NEMO $GRID_DEFS/coordinates.nc $GRID_DEFS/data_1m_potential_temperature_nomask.nc \
+    nemo_oras4_ic.nc
 $ ncview nemo_oras4_ic.nc
 ```
 
@@ -218,10 +239,16 @@ Note that because GODAS has a limited domain the salt in the Arctic has been fil
 
 ## Package ocean-ic into a tarball using PyInstaller
 
-Be aware of this issue https://github.com/pyinstaller/pyinstaller/issues/1781. It's necessary to downgrade setuptools:
+Be aware of this issue https://github.com/pyinstaller/pyinstaller/issues/1781. It may be necessary to downgrade setuptools with the following command:
 
 ```{bash}
 $ conda install setuptools==19.2
+```
+
+First install pyinstaller:
+
+```{bash}
+$ pip install pyinstaller
 ```
 
 Create release:
@@ -243,16 +270,16 @@ $ s3cmd setacl --acl-public --guess-mime-type s3://dp-drop/ocean-ic/release/make
 ## Download ocean-ic tarball and test
 
 ```{bash}
-$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/release/makeic-0.0.3.tar.gz
-$ tar zxvf makeic-0.0.3.tar.gz
-$ export PATH=$(pwd)/makeic-0.0.3/:$PATH
-$ makeic --help
+$ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/release/makeic-0.0.4.tar.gz
+$ tar zxvf makeic-0.0.4.tar.gz
+$ export PATH=$(pwd)/makeic-0.0.4/:$PATH
+$ makeic_simple --help
 $ mkdir -p test
 $ cd test/
 $ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-ic/test/test_data.tar.gz
 $ tar zxvf test_data.tar.gz
 $ cd test_data/input
-$ makeic GODAS pottmp.2016.nc salt.2016.nc NEMO nemo_godas_ic.nc
+$ makeic_simple GODAS pottmp.2016.nc salt.2016.nc NEMO nemo_godas_ic.nc
 ```
 
 Compare to known output:

@@ -1,27 +1,23 @@
 # -*- mode: python -*-
 
+import os
+import sys
+
 block_cipher = None
 
-extra_bins = [
-    ('/home/599/nah599/more_home/anaconda2/lib/python2.7/site-packages/llvmlite/binding/libllvmlite.so', 'llvmlite/binding')
-]
+ocean_ic_dir = '../'
+anaconda_dir = os.path.join(os.environ['HOME'], 'anaconda2')
 
-grid_def_datas = [
-    ('/short/v45/nah599/more_home/ocean-ic/grid_defs/coordinates.nc', './grid_defs/'),
-    ('/short/v45/nah599/more_home/ocean-ic/grid_defs/coordinates_grid_T.nc', './grid_defs/'),
-    ('/short/v45/nah599/more_home/ocean-ic/grid_defs/coordinates_grid_U.nc', './grid_defs/'),
-    ('/short/v45/nah599/more_home/ocean-ic/grid_defs/coordinates_grid_V.nc', './grid_defs/'),
-    ('/short/v45/nah599/more_home/ocean-ic/grid_defs/data_1m_potential_temperature_nomask.nc', './grid_defs/'),
-    ('/short/v45/nah599/more_home/ocean-ic/grid_defs/ocean_hgrid.nc', './grid_defs/'),
-    ('/short/v45/nah599/more_home/ocean-ic/grid_defs/ocean_mask.nc', './grid_defs/'),
-    ('/short/v45/nah599/more_home/ocean-ic/grid_defs/ocean_vgrid.nc', './grid_defs/'),
-    ('/short/v45/nah599/more_home/ocean-ic/grid_defs/pottmp.2016.nc', './grid_defs/')
-]
+# Edit this to specify the location to libllvmlite.so
+libllvmlite = os.path.join(anaconda_dir, 'lib/python2.7/site-packages/llvmlite/binding/libllvmlite.so')
+if not os.path.exists(libllvmlite):
+    print("ERROR: can't find libllvmlite.so, please edit libllvm var in makeic.spec.")
+    sys.exit(1)
 
-a = Analysis(['../makeic.py'],
-             pathex=['/short/v45/nah599/more_home/ocean-ic'],
-             binaries=extra_bins,
-             datas=grid_def_datas,
+a = Analysis([os.path.join(ocean_ic_dir, 'makeic.py')],
+             pathex=[ocean_ic_dir],
+             binaries=[(libllvmlite, 'llvmlite/binding')],
+             datas=[],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
