@@ -34,7 +34,8 @@ def main():
 
     assert args.model_name == 'MOM' or args.model_name == 'MOM1' or \
         args.model_name == 'NEMO'
-    assert args.reanalysis_name == 'GODAS' or args.reanalysis_name == 'ORAS4'
+    assert args.reanalysis_name == 'GODAS' or args.reanalysis_name == 'ORAS4' or \
+        args.reanalysis_name == 'WOA'
 
     if 'MOM' in args.model_name and args.model_mask is None:
         print("When using model MOM please provide a mask using --model_mask",
@@ -50,9 +51,13 @@ def main():
     if args.reanalysis_name == 'ORAS4':
         temp_src_var = 'thetao'
         salt_src_var = 'so'
-    else:
+    elif args.reanalysis_name == 'GODAS':
         temp_src_var = 'pottmp'
         salt_src_var = 'salt'
+    elif args.reanalysis_name == 'WOA':
+        temp_src_var = 'potential_temperature'
+        salt_src_var = 'practical_salinity'
+
 
     if 'MOM' in args.model_name:
         temp_dest_var = 'temp'
