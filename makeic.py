@@ -12,7 +12,7 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument('reanalysis_name', help="""
-                        Name of src data/grid, must be GODAS or ORAS4""")
+                        Name of src data/grid, must be GODAS, ORAS4 or WOA""")
     parser.add_argument('reanalysis_hgrid', help='Reanalysis horizontal grid spec file.')
     parser.add_argument('reanalysis_vgrid', help='Reanalysis vertical grid spec file.')
     parser.add_argument('temp_reanalysis_file', help='Temperature file from reanalysis.')
