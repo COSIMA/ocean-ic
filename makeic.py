@@ -37,11 +37,6 @@ def main():
     assert args.reanalysis_name == 'GODAS' or args.reanalysis_name == 'ORAS4' or \
         args.reanalysis_name == 'WOA'
 
-    if 'MOM' in args.model_name and args.model_mask is None:
-        print("When using model MOM please provide a mask using --model_mask",
-                file=sys.stderr)
-        return 1
-
     if os.path.exists(args.output_file):
         print("Output file {} already exists, ".format(args.output_file) + \
                "please move or delete.", file=sys.stderr)
