@@ -50,7 +50,7 @@ def main():
         temp_src_var = 'pottmp'
         salt_src_var = 'salt'
     elif args.reanalysis_name == 'WOA':
-        temp_src_var = 'potential_temperature'
+        temp_src_var = 'conservative_temperature'
         salt_src_var = 'practical_salinity'
 
 
