@@ -13,7 +13,7 @@ This tool is written in Python and depends a few different Python packages. It a
 
 Download ocean-ic:
 ```{bash}
-$ git clone --recursive https://github.com/nicjhan/ocean-ic.git
+$ git clone --recursive https://github.com/COSIMA/ocean-ic.git
 $ cd ocean-ic
 $ wget http://s3-ap-southeast-2.amazonaws.com/dp-drop/ocean-regrid/grid_defs.tar.gz
 $ tar zxvf grid_defs.tar.gz
@@ -228,10 +228,10 @@ FATAL from PE  450:  Error: temperature out of range with value     6.0417723593
 # Example output
 
 ## MOM IC temperature field based on ORAS4 reanalysis
-![Temp from MOM IC based on ORAS4 reanalysis](https://raw.github.com/nicjhan/ocean-ic/master/doc/MOM_IC_TEMP_ORAS4.png)
+![Temp from MOM IC based on ORAS4 reanalysis](https://raw.github.com/COSIMA/ocean-ic/master/doc/MOM_IC_TEMP_ORAS4.png)
 
 ## MOM IC salt field based on GODAS reanalysis
-![Salt from MOM IC based on GODAS reanalysis](https://raw.github.com/nicjhan/ocean-ic/master/doc/MOM_IC_SALT_GODAS.png)
+![Salt from MOM IC based on GODAS reanalysis](https://raw.github.com/COSIMA/ocean-ic/master/doc/MOM_IC_SALT_GODAS.png)
 
 Note that because GODAS has a limited domain the salt in the Arctic has been filled with a 'representational value', in this case taken from the Bering Strait.
 
