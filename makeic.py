@@ -30,9 +30,9 @@ def main():
                         help="""Use MPI to when calculating the regridding weights.
                                This will speed up the calculation considerably.""")
 
-    # Add mom_version argument only if dest_name is MOM
-    parser.add_argument('--mom_version', type=str, default=None,
-                    help="MOM version (e.g., MOM5, MOM6). Required if model_name is MOM or MOM1.")
+    parser.add_argument('--mom_version', type=str, default='MOM5',
+                    help="""MOM version (e.g., MOM5, MOM6). Only used if model_name is MOM or MOM1. 
+                    Defaults to MOM5.""")
 
     args = parser.parse_args()
 
@@ -40,10 +40,6 @@ def main():
         args.model_name == 'NEMO'
     assert args.reanalysis_name == 'GODAS' or args.reanalysis_name == 'ORAS4' or \
         args.reanalysis_name == 'WOA'
-
-    # Ensure mom_version is provided when dest_name is MOM
-    if args.model_name == 'MOM' and args.mom_version is None:
-        parser.error("--mom_version is required when dest_name is MOM")
 
     if os.path.exists(args.output_file):
         print("Output file {} already exists, ".format(args.output_file) + \
