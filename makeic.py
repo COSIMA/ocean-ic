@@ -5,7 +5,6 @@ from __future__ import print_function
 import sys, os
 import argparse
 import netCDF4 as nc
-
 from regridder import regrid
 
 def main():
@@ -30,6 +29,11 @@ def main():
     parser.add_argument('--use_mpi', action='store_true', default=False,
                         help="""Use MPI to when calculating the regridding weights.
                                This will speed up the calculation considerably.""")
+
+    parser.add_argument('--mom_version', type=str, default='MOM5',
+                    help="""MOM version (e.g., MOM5, MOM6). Only used if model_name is MOM or MOM1. 
+                    Defaults to MOM5.""")
+
     args = parser.parse_args()
 
     assert args.model_name == 'MOM' or args.model_name == 'MOM1' or \
@@ -73,7 +77,7 @@ def main():
                                        args.model_vgrid,
                                        args.output_file, dest_var, dest_mask=args.model_mask,
                                        month=args.month, regrid_weights=weights,
-                                       use_mpi=args.use_mpi, write_ic=True)
+                                       use_mpi=args.use_mpi, write_ic=True, mom_version=args.mom_version)
         if weights is None:
             return 1
     try:
