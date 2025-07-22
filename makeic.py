@@ -55,7 +55,7 @@ def main():
         salt_src_var = 'salt'
     elif args.reanalysis_name == 'WOA':
         # For TEOS10/Roquet_Rho, use conservative temperature and absolute salinity.
-        # For OM2, we used conservative temperature and practical salinity
+        # For OM2, we used conservative_temperature and practical_salinity
         temp_src_var = 'conservative_temperature'
         salt_src_var = 'absolute_salinity' 
 
