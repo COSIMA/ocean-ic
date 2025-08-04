@@ -37,8 +37,8 @@ def main():
                     Defaults to MOM5.""")
 
     parser.add_argument('--salinity', type=str, default='practical', choices=['practical','absolute'],
-                    help="""MOM version (e.g., MOM5, MOM6). Only used if model_name is MOM or MOM1. 
-                    Defaults to MOM5.""")
+                    help="""salinity type (e.g., pracitcal or absolute). Only used if reanlysis type is WOA. 
+                    Defaults to practical.""")
 
     args = parser.parse_args()
 
@@ -59,11 +59,11 @@ def main():
         salt_src_var = 'salt'
     elif args.reanalysis_name == 'WOA':
         # For TEOS10/Roquet_Rho, use conservative temperature and absolute salinity.
-        # For OM2, we used conservative_temperature and practical_salinity
+        # For OM2, we used conservative temperature and practical salinity
         temp_src_var = 'conservative_temperature'
-        if args.salinity == 'absolute' :
+        if args.salinity == 'absolute':
             salt_src_var = 'absolute_salinity'
-        else :
+        else:
             salt_src_var = 'practical_salinity'
 
 
