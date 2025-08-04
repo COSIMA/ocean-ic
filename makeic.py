@@ -42,7 +42,7 @@ def main():
 
     args = parser.parse_args()
 
-    if args.salinity == 'absolute' and args.reanlysis_name != 'WOA':
+    if args.salinity == 'absolute' and args.reanalysis_name != 'WOA':
         raise NotImplementedError("absolute salinity only available for WOA reanalysis")
 
     if os.path.exists(args.output_file):
