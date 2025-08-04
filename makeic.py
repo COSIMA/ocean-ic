@@ -11,14 +11,16 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument('reanalysis_name', help="""
-                        Name of src data/grid, must be GODAS, ORAS4 or WOA""")
+                        Name of src data/grid, must be GODAS, ORAS4 or WOA""",
+                        choices=['GODAS','ORAS4','WOA'])
     parser.add_argument('reanalysis_hgrid', help='Reanalysis horizontal grid spec file.')
     parser.add_argument('reanalysis_vgrid', help='Reanalysis vertical grid spec file.')
     parser.add_argument('temp_reanalysis_file', help='Temperature file from reanalysis.')
     parser.add_argument('salt_reanalysis_file', help='Salt file from reanalysis.')
 
     parser.add_argument('model_name', help="""
-                        Name of model, must be MOM, MOM1 or NEMO""")
+                        Name of model, must be MOM, MOM1 or NEMO""",
+                        choices=['MOM','MOM1','NEMO'])
     parser.add_argument('model_hgrid', help='Model horizontal grid spec file.')
     parser.add_argument('model_vgrid', help='Model vertical grid spec file.')
     parser.add_argument('output_file', help='Name of the destination/output file.')
@@ -34,12 +36,14 @@ def main():
                     help="""MOM version (e.g., MOM5, MOM6). Only used if model_name is MOM or MOM1. 
                     Defaults to MOM5.""")
 
+    parser.add_argument('--salinity', type=str, default='practical', choices=['practical','absolute'],
+                    help="""salinity type (e.g., pracitcal or absolute). Only used if reanlysis type is WOA. 
+                    Defaults to practical.""")
+
     args = parser.parse_args()
 
-    assert args.model_name == 'MOM' or args.model_name == 'MOM1' or \
-        args.model_name == 'NEMO'
-    assert args.reanalysis_name == 'GODAS' or args.reanalysis_name == 'ORAS4' or \
-        args.reanalysis_name == 'WOA'
+    if args.salinity == 'absolute' and args.reanlysis_name != 'WOA':
+        raise NotImplementedError("absolute salinity only available for WOA reanalysis")
 
     if os.path.exists(args.output_file):
         print("Output file {} already exists, ".format(args.output_file) + \
@@ -54,8 +58,13 @@ def main():
         temp_src_var = 'pottmp'
         salt_src_var = 'salt'
     elif args.reanalysis_name == 'WOA':
+        # For TEOS10/Roquet_Rho, use conservative temperature and absolute salinity.
+        # For OM2, we used conservative temperature and practical salinity
         temp_src_var = 'conservative_temperature'
-        salt_src_var = 'practical_salinity'
+        if args.salinity == 'absolute':
+            salt_src_var = 'absolute_salinity'
+        else:
+            salt_src_var = 'practical_salinity'
 
 
     if 'MOM' in args.model_name:
