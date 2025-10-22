@@ -36,48 +36,57 @@ def main():
                     help="""MOM version (e.g., MOM5, MOM6). Only used if model_name is MOM or MOM1. 
                     Defaults to MOM5.""")
 
-    parser.add_argument('--salinity', type=str, default='practical', choices=['practical','absolute'],
-                    help="""salinity type (e.g., pracitcal or absolute). Only used if reanlysis type is WOA. 
-                    Defaults to practical.""")
-
     args = parser.parse_args()
-
-    if args.salinity == 'absolute' and args.reanalysis_name != 'WOA':
-        raise NotImplementedError("absolute salinity only available for WOA reanalysis")
 
     if os.path.exists(args.output_file):
         print("Output file {} already exists, ".format(args.output_file) + \
                "please move or delete.", file=sys.stderr)
         return 1
 
+    temp_vars = {
+        "pottemp": {"src": None, "dest": None},
+        "contemp": {"src": None, "dest": None}
+    }
+    salt_vars = {
+        "pracsalt": {"src": None, "dest": None},
+        "abssalt": {"src": None, "dest": None}
+    }
     # Read in temperature and salinity data.
     if args.reanalysis_name == 'ORAS4':
-        temp_src_var = 'thetao'
-        salt_src_var = 'so'
+        temp_vars["pottemp"]["src"] = 'thetao'
+        salt_vars["pracsalt"]["src"] = 'so'
     elif args.reanalysis_name == 'GODAS':
-        temp_src_var = 'pottmp'
-        salt_src_var = 'salt'
+        temp_vars["pottemp"]["src"] = 'pottmp'
+        salt_vars["pracsalt"]["src"] = 'salt'
     elif args.reanalysis_name == 'WOA':
-        # For TEOS10/Roquet_Rho, use conservative temperature and absolute salinity.
-        # For OM2, we used conservative temperature and practical salinity
-        temp_src_var = 'conservative_temperature'
-        if args.salinity == 'absolute':
-            salt_src_var = 'absolute_salinity'
-        else:
-            salt_src_var = 'practical_salinity'
-
+        temp_vars["pottemp"]["src"] = 'potential_temperature'
+        temp_vars["contemp"]["src"] = 'conservative_temperature'
+        salt_vars["pracsalt"]["src"] = 'practical_salinity'
+        salt_vars["abssalt"]["src"] = 'absolute_salinity'
 
     if 'MOM' in args.model_name:
-        temp_dest_var = 'temp'
-        salt_dest_var = 'salt'
+        # OM2 expects variables conservative temp and practical salt in variables called
+        # "temp" and "salt"
+        # OM3 expects potential temp and practical salt in variables called "ptemp" and "salt"
+        # (by default)
+        temp_vars["pottemp"]["dest"] = 'ptemp'
+        temp_vars["contemp"]["dest"] = 'temp'
+        salt_vars["pracsalt"]["dest"] = 'salt'
+        salt_vars["abssalt"]["dest"] = 'asalt'
     else:
-        temp_dest_var = 'votemper'
-        salt_dest_var = 'vosaline'
+        temp_vars["pottemp"]["dest"] = 'votemper'
+        salt_vars["pracsalt"]["dest"] = 'vosaline'
+
+    temp_var_to_regrid = [
+        (args.temp_reanalysis_file, var["src"], var["dest"]) for _, var in temp_vars.items() if var["src"] is not None
+    ]
+    salt_var_to_regrid = [
+        (args.salt_reanalysis_file, var["src"], var["dest"]) for _, var in salt_vars.items() if var["src"] is not None
+    ]
+    vars_to_regrid = temp_var_to_regrid + salt_var_to_regrid
 
     # Regrid temp and salt, write out to the same file.
     weights = None
-    vars_to_regrid = [(args.temp_reanalysis_file, temp_src_var, temp_dest_var),
-                      (args.salt_reanalysis_file, salt_src_var, salt_dest_var)]
     for src_file, src_var, dest_var in vars_to_regrid:
         weights = regrid.do_regridding(args.reanalysis_name, (args.reanalysis_hgrid,),
                                        args.reanalysis_vgrid,
@@ -96,7 +105,7 @@ def main():
 
     # May need to scale the salt.
     with nc.Dataset(args.output_file, 'r+') as f:
-        for salt_name in ['vosaline', 'salt']:
+        for salt_name in ['vosaline', 'salt', 'asalt']:
             try:
                 salt_var = f.variables[salt_name]
                 if salt_var.units == 'kg/kg':
@@ -104,7 +113,7 @@ def main():
                     salt_var[:] *= 1000
             except KeyError:
                 pass
-        for temp_name in ['votemper', 'temp']:
+        for temp_name in ['votemper', 'temp', 'ptemp']:
             try:
                 temp_var = f.variables[temp_name]
                 if temp_var.units == 'K':
